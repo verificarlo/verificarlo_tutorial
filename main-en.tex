@@ -50,70 +50,53 @@
 \title{\includegraphics[keepaspectratio, scale=0.4]{verificarlo-logo.pdf}\\[4mm]
   Tutorial}
 
-\hypersetup{pdftitle={Tutoriel Verificarlo}}
+\hypersetup{pdftitle={Verificarlo Tutorial}}
 
-\author{eric.petit@intel.com; yohan.chatelain@uvsq.fr; pablo.oliveira@uvsq.fr;
+\author{eric.petit@intel.com; pablo.oliveira@uvsq.fr; yohan.chatelain@uvsq.fr;
   francois.fevotte@edf.fr; bruno.lathuiliere@edf.fr}
 
 \date{Université de Versailles Saint-Quentin en Yvelines - Intel - EDF}
 
 \begin{document}
 \maketitle
-\tableofcontents
-\vspace{2cm}
-Verificarlo is an open-source project under GPL v3. It is freely available at the following address : \\
-\centerline{\url{https://github.com/verificarlo/verificarlo}}
 
-~\\A Debian package and a Docker container are also available: \\
-\begin{itemize}
-\item \url{https://github.com/verificarlo/verificarlo/releases/tag/v0.2.0-debian}
-\item \url{https://hub.docker.com/r/verificarlo/verificarlo/}
-\end{itemize}
+\centerline{\url{https://github.com/verificarlo/verificarlo}}
+\tableofcontents
+
 
 \section{Verificarlo Basics}
-\subsection{Start a verificarlo project}
 
-{\sc{Verificarlo}} is overloading the LLVM compiler. It will be used instead of your usual compiler using the command {\tt verificarlo}.
+To debug or optimize floating-point computation with Verificarlo, the first
+step is to compile your program with it. Verificarlo is built as a set of LLVM
+plugins; to compile a program with verificarlo you should use the \texttt{verificarlo}
+command instead of the usual \texttt{clang}, \texttt{icc} or \texttt{gcc}.
 
-To start a project, the first thing is to modify your build system to use the {\tt{verificarlo}} compiler.
+Once a program is compiled with Verificarlo, you can load various backends to
+simulate round-off noise or the effect of lower floating-point precisions.  To
+select and configure the backends that will be used, one defines the
+\texttt{VFC\_BACKENDS} environment variable.
 
-Since the fundamental usage of Verificarlo is based on multiple execution sample study, it is necessary to provide easy execution and data of interest collection script for your application. Since all applications have different need, you are responsible to provide {\it ad hoc} implementation. However, you will find some example in the tutorial code and the Verificarlo {\tt test} directory.
+This tutorial will guide you on how to use Verificarlo, when in doubt the
+documentation is available at \url{https://github.com/verificarlo/verificarlo}.
 
-\subsection{Dealing with Verificarlo configurations}
+In this tutorial, we will use the docker container available at
+\url{https://hub.docker.com/r/verificarlo/verificarlo/}.
+To pull the latest container with verificarlo and start working with it on
+the tutorial workspace type the following commands,
+\begin{verbatim}
+$ wget <address of verificarlo-tutorial.tar.gz>
+$ tar xzvf verificarlo-tutorial.tar.gz
+$ cd verificarlo-tutorial/
+$ docker pull verificarlo/verificarlo
+$ docker run -v $PWD:/workdir -it verificarlo/verificarlo bash
+\end{verbatim}
 
-\subsubsection{From a terminal}
-
-Verificarlo is controlled through three environment variables
-\begin{enumerate}
-\item {\tt  VERIFICARLO\_MCAMODE}:
-\begin{enumerate}
-\item MCA: (default value) {\it Monte Carlo Arithmetic} with inbound and outbound error
-\item IEEE: noiseless execution equivalent to IEEE (useful to check that the instrumentation didn't 'break' the code).
-\item PB: {\it Precision Bounding} only inbound error
-\item RR: {\it Random Rounding} only outbound error
-\end{enumerate}
-\item {\tt VERIFICARLO\_PRECISION} control the virtual precision, {\it i.e.} the magnitude of the noise introduction. The default value is  53, the less significant bit of double precision floating point number. The equivalent in single precision is 24.~\cite{denis2016verificarlo,parker1997monte}.
-
-\item {\tt VERIFICARLO\_BACKEND} In its github released version, Verificarlo supports two main {\it backends} with theoretically equivalent behavior:
-\begin{description}
-\item[{\tt MPFR}] : This is the original reference implementation using the multi precision library MPFR~\cite{Fousse:2007:MMB:1236463.1236468} and extrapolated from  Frechtling~\cite{frechtling2015automated} work.
-
-\item[{\tt QUAD}] : Since doubling the mantissa number of bits is enough to represent all the noise that can influence the rounding, {\tt Quad} uses {\it ad-hoc} quadruple precision (binary128) implementation of the stochastic arithmetic for double precision (binary64) computation, and double (binary64) for single precision (binary32) computation.
-\end{description}
-\end{enumerate}
-
-To change these variable values, you can use the  {\tt export} Unix command, or do an affectation in your shell script running the application, or using the API changing it dynamically from the application source code.
-
-In order to be sure of the execution setup during your experiment, we advise you to fix the desired parameters in the execution scripts.
-
-
-\subsubsection{From the source code}
-
-Using the verificarlo API, it is possible for advanced user to control verificarlo at runtime from the application by inserting calls into the program.
-
-This functionality is undocumented and we encourage users who want to try to do it to contact us directly from github.
-
-
+\begin{question}
+  Start the docker container and ensure you can run the \texttt{verificarlo} command,
+\begin{verbatim}
+$ verificarlo --help
+\end{verbatim}
+\end{question}
 
 \input{polynomial}
 

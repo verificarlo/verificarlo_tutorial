@@ -1,8 +1,8 @@
-\section{Practical exercise: About polynomial evaluation}
+\section{Practical exercice: Polynomial evaluation}
 
-Polynomial evaluation is a common source of computational error. In particular, they are used for function interpolation in libraries or user codes. As we will see, the various representation of the same polynomial do not have the same behavior in terms of performance, but also in term of numerical accuracy!
+Polynomial evaluation is a common source of computational error. Polynomials are frequently used for function interpolation in libraries or user codes. As we will see, different evaluations of the same polynomial do not have the same behavior in terms of performance or numerical accuracy.
 
-This tutorial is using the following Tchebychev polynomial from ~\cite[pp.52-54]{parker1997monte}:
+This tutorial is uses the following Tchebychev polynomial from ~\cite[pp.52-54]{parker1997monte}:
 
 $$T(x)=\sum_{i=0}^{10}{a_i \times x^{2i}}$$
 With:
@@ -25,56 +25,77 @@ This example is discussed with details in~\cite[pp.52-54]{parker1997monte}.
 
 \subsection{Expanded form evaluation}
 
-\subsubsection{Your first step with Verificarlo}
+\subsubsection{First steps with Verificarlo}
 
-In this first approach, we will evaluate the polynomial in its expanded (monomial) form as given in the previous section. % Why monomial?
-We first evaluate it in single precision.
+In this first approach, we will evaluate the polynomial in its expanded form as given in the previous section. We first evaluate it in single precision.
 
 \begin{question}
   \begin{enumerate}[(a)]
   \item Open the {\tt tchebychev.c} file and observe the function {\tt REAL expanded(REAL x)}.
 
   \item Compile {\tt tchebychev.c} with {\tt verificarlo} using the following command:
-
-    {\tt verificarlo -{}-verbose -D FLOAT tchebychev.c -o tchebychev}
-
-  \item Update the environment variable to use the {\tt QUAD} backend with {\tt MCA} mode and virtual precision of {\tt 24}.
-  \item Execute the program multiple time with  $x=0.99$ using the command : \newline
-{\tt ./tchebychev 0.99 EXPANDED} \newline
-What can you observe?
+\begin{verbatim}
+verificarlo -D FLOAT tchebychev.c -o tchebychev
+\end{verbatim}
+  \item Run the program.
   \end{enumerate}
 \end{question}
 
+When running the program it complains that at least one backend should be
+selected with the \texttt{VFC\_BACKENDS} environment variable.
+To run the program with standard IEEE-754 arithmetic one can use the simple
+IEEE backend (\texttt{libinterflop\_ieee.so}). The backend has a \texttt{--debug}
+option that shows the floating-point operations that have been instrumented.
 
+\begin{question}
+Run the program using the IEEE backend,
+\begin{verbatim}
+VFC_BACKENDS="libinterflop_ieee.so --debug" ./tchebychev 0.99 EXPANDED
+\end{verbatim}
+\end{question}
+
+To evaluate the numerical error we will use the Monte Carlo arithmetic backend
+(\texttt{libinterflop\_mca.so}.  Because we are using IEEE-754 floats, to
+simulate round-off errors we should work at a 24 bits precision.
 
 \begin{question}
   \begin{enumerate}[(a)]
-  \item Recompile with verificarlo the program in double precision using the command
+  \item Run the program using the Monte Carlo Arithmetic backend at 24 bits precision,
+\begin{verbatim}
+VFC_BACKENDS="libinterflop_mca.so --precision=24" ./tchebychev 0.99 EXPANDED
+\end{verbatim}
+  \item Execute the program multiple times. What can you observe?
+  \end{enumerate}
+\end{question}
 
+Monte Carlo arithmetic backend supports different modes,
+\begin{itemize}
+
+  \item \texttt{-{}-mode=rr} is the \emph{random round} mode that adds noise on the
+    result of an operation only when the operation is not exactly representable
+    at the given precision. This mode is useful to simulate the effect of
+    round-off errors.
+
+  \item \texttt{-{}-mode=pb} is the \emph{precision bound} mode that adds noise on
+  the operands before performing the operation. It is useful to simulate the
+    effect of cancellations errors.
+
+  \item \texttt{-{}-mode=mca} is the default mode that combines \texttt{rr} and
+  \texttt{pb} modes.
+
+\end{itemize}
+
+\begin{question}
+  \begin{enumerate}[(a)]
+  \item Now recompile with verificarlo the program in double precision using the command
     {\tt verificarlo -D DOUBLE tchebychev.c -o tchebychev} \\
-   Check that the environment variable are still in the same configuration than in question 1.
-  \item Execute the program multiple time in $x=0.99$ using the command : {\tt ./tchebychev 0.99 EXPANDED}. \newline
-What can you observe?
+  \item Execute the program with arguments \texttt{0.99 EXPANDED} with the Monte Carlo arithmetic backend. Try different precisions such as 53, 24, 10. Try also to use different modes (rr, pb, mca).
   \end{enumerate}
 \end{question}
 
-No recompilation is required to change the analysis mode and another virtual precision.
+\subsubsection{Numerical quality analysis}
 
-\begin{question}
-  \begin{enumerate}[(a)]
-  \item Update the environment variable to use the {\tt QUAD} backend with  {\tt MCA} mode and virtual precision  {\tt 53}.
-  \item Execute the program again in $x=0.99$ using the command : {\tt ./tchebychev 0.99 EXPANDED}. \newline
-What can you observe?
-  \end{enumerate}
-\end{question}
-
-\subsubsection{First numerical quality analysis of the polynomial evaluation}
-
-In this section, we propose you to analyze the numerical quality of the results computed by the expanded evaluation of the polynomial. To simplify this task, a large part of the verificarlo command to execute is automated in the script~\texttt{run.sh}. The visualization is done using~\texttt{plot.py} script.
-
-
-
-
+In this section, we propose you to analyze the numerical quality of the results computed by the expanded evaluation of the polynomial. To simplify this task, you can use the script~\texttt{run.sh} which automates the required verificarlo runs. Visualization is done using the \texttt{plot.py} script.
 
 
 \begin{question}
