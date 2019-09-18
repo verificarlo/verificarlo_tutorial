@@ -10,6 +10,9 @@
 \usepackage{placeins}
 \usepackage{algorithm}
 \usepackage{algpseudocode}
+\usepackage{tikz}
+\usetikzlibrary{shapes.geometric}
+\usetikzlibrary{turtle}
 
 \graphicspath{{images/} {figs/}}
 
@@ -103,11 +106,15 @@ $ verificarlo --help
 
 %% Uncomment below lines to include the extra Factored Form analysis
 %% \FloatBarrier
-%% \input{polynomial-factored.tex}
+%% \input{polynomial-factored}
 
 %% Uncomment below lines to include the extra Horn Compensated analysis
 \FloatBarrier
-\input{polynomial-compensated.tex}
+\input{polynomial-compensated}
+
+%% Uncomment the following line to include Delta Debug in the tutorial
+\FloatBarrier
+\input{deltadebug}
 
 %% Uncomment the following line to include Veritracer in the tutorial
 %% \FloatBarrier

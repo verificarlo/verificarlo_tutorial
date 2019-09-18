@@ -1,0 +1,50 @@
+\section{Pinpointing bugs with Delta-Debug: Archimedes method}
+
+\begin{figure}
+  \centering
+  \begin{tikzpicture}[scale=1.5]
+    \draw [magenta] (0,0) circle (1);
+    \draw [fill, black] (0,0) circle (.02);
+    \begin{scope}[yshift=1cm]
+    \draw [blue, turtle={ home,
+      right=90, forward=.5773502691896257, % tan(pi/6)
+      right=60, forward=2*.5773502691896257,
+      right=60, forward=2*.5773502691896257,
+      right=60, forward=2*.5773502691896257,
+      right=60, forward=2*.5773502691896257,
+      right=60, forward=2*.5773502691896257,
+      right=60, forward=.5773502691896257
+    }];
+    \end{scope}
+\end{tikzpicture}
+  \caption{Archimedes method to approximate PI with a 6-sided circumscribed polygon.
+    \label{fig:archimedes}
+  }
+\end{figure}
+
+In this section we demonstrate how we can use Verificarlo to precisely localize a numerical bug in a program. The localization method is based on the Zeller's Delta-Debug reduction method~\cite{zeller2001automated}. Verificarlo uses the Interflop's stochastic Delta-Debug library by Bruno Lathuilière.
+
+In 200BC Archimedes proposed the first numerical method for computing $\pi$.
+Archimedes method uses one $6.n$-sided circumscribed polygon to the unit circle
+whose area provides an upper bound for $\pi$ and one $6.n$-sided inscribed polygon
+whose area provides a lower bound for $\pi$.
+
+Here we will use the circumscribed polygon to approximate $\pi$.
+Figure~\ref{fig:archimedes} shows a 6-sided circumscribed polygon to the unit
+circle. Archimedes shows geometrically that the area of the polygons can be computed
+with the following recursive sequence,
+
+\begin{align*}
+  T_1 &= \frac{1}{\sqrt{3}} \\
+  T_{i+1} &= \frac{\sqrt{T_i^2+1} - 1}{T_i} \\
+  A_{i} &= 6 \times 2^{i-1} \times T_{i} \xrightarrow[i \to \infty]{} \pi
+\end{align*}
+
+
+
+
+
+
+
+
+
