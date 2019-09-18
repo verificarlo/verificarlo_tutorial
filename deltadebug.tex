@@ -1,6 +1,6 @@
 \section{Pinpointing bugs with Delta-Debug: Archimedes method}
 
-\begin{figure}
+\begin{figure}[h]
   \centering
   \begin{tikzpicture}[scale=1.5]
     \draw [magenta] (0,0) circle (1);
@@ -39,6 +39,19 @@ with the following recursive sequence,
   T_{i+1} &= \frac{\sqrt{T_i^2+1} - 1}{T_i} \\
   A_{i} &= 6 \times 2^{i-1} \times T_{i} \xrightarrow[i \to \infty]{} \pi
 \end{align*}
+
+In this part of the tutorial we will work inside the \texttt{archimedes/} folder.
+
+\begin{question}
+  \begin{enumerate}[(a)]
+    \item Open the file \texttt{archimedes.c} and analyze the code.
+    \item The provided makefile builds the program using Verificarlo. Run the program
+      with the IEEE backend (\texttt{libinterflop\_ieee.so}) and with the MCA backend
+      (\texttt{libinterflop\_mca.so --precision 53}).
+    \item How many digits are significants in the computed result?
+  \end{enumerate}
+\end{question}
+
 
 
 

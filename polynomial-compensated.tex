@@ -80,7 +80,9 @@ The algorithm for compensated horner scheme described in~\cite{graillat2005compe
 The lines 5 and 6, evaluates HORNER with EFT calls. Line 7 accumulate the error terms, which will be add to the final result on line 9.
 
 \begin{question}
+  \begin{enumerate}[(a)]
     \item Modify {\tt run.sh} to call comphorner with the following command: {\tt ./run.sh COMPHORNER FLOAT 24 }.
+  \end{enumerate}
 \end{question}
 
 Instead of (carefully) recoding EFTs {\sc TwoProd} and {\sc TwoSum} manually, we suggest to use {\tt libeft}~\cite{libeft} available and documented at the following address: \url{https://github.com/ffevotte/libeft}.
