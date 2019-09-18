@@ -7,15 +7,17 @@ set -e
 export LC_ALL=C
 
 # Check all arguments
-if [ "$#" -ne 3 ]; then
-  echo "usage: run.sh [EXPANDED | FACTORED | HORNER | COMPHORNER] [FLOAT | DOUBLE] vprecision"
-  echo "       vprecision is Verificarlo Virtual Precision (an integer between 0 and 53)"
+if [ "$#" -ne 4 ]; then
+  echo "usage: run.sh [EXPANDED | FACTORED | HORNER | COMPHORNER] [FLOAT | DOUBLE] vprecision mode"
+  echo "      vprecision is the MCA Virtual Precision (a positive integer)"
+  echo "      mode is MCA Mode, one of [ mca | pb | rr ]"
   exit 1
 fi
 
 METHOD=$1
 REAL=$2
-export VERIFICARLO_PRECISION=$3
+VERIFICARLO_PRECISION=$3
+VERIFICARLO_MCAMODE=$4
 
 # Check method
 case "${METHOD}" in
@@ -55,6 +57,7 @@ verificarlo -D ${REAL} tchebychev.c -o tchebychev
 #   - i: sample number
 #   - x: input value
 #   - T: polynomial evaluation on x, T(x)
+export VFC_BACKENDS="libinterflop_mca.so --precision $VERIFICARLO_PRECISION --mode $VERIFICARLO_MCAMODE"
 echo "i x t" > ${METHOD}-${REAL}.tab
 for x in $(seq 0.0 0.01 1.0); do
     for i in $(seq 1 20); do
