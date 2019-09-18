@@ -1,12 +1,14 @@
 \section{Compensated Horner scheme}
 
-The "compensated" algorithms are an usual class of algorithm to increase the program precision without changing the format. The rational is to capture at every operation the accurate error term and to reinject it into the result.
+The "compensated" algorithms are an usual class of algorithm to increase the
+program precision without changing the format. The rational is to capture at
+every operation the accurate error term and to reinject it into the result.
 
-In the Horner scheme, it is possible to retrieve at every step the error in $x^2$ and the addition of the next coefficient by using respectively the
-$Veltkamp-Dekker$ ({\tt twoProd}) for the product and
-$twoSum$ for the sum. These algorithm are qualified as
-({\it Error Free Transform}), EFT, in the literature.
-
+In the Horner scheme, it is possible to retrieve at every step the error in
+$x^2$ and the addition of the next coefficient by using respectively the
+$Veltkamp-Dekker$ ({\tt twoProd}) for the product and $twoSum$ for the sum.
+These algorithm are qualified as ({\it Error Free Transform}), EFT, in the
+literature.
 
 To better illustrate the concept, we can briefly analyze the $twoSum$ algorithm:
 \begin{lstlisting}[frame=single, style=customC]
