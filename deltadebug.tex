@@ -56,7 +56,7 @@ around iteration 15. Where is the error in the code? To help pinpointing the err
 we are going to use Delta-Debug.
 
 Delta-Debug (DD) is a general bug reduction method that allows to efficiently find a
-minimal set of conditions that triger a bug. In this case, we are going to consider
+minimal set of conditions that trigger a bug. In this case, we are going to consider
 the set of floating-point instructions in the program. We are using DD to
 find a minimal set of instructions responsible for the instability in the output.
 
@@ -91,7 +91,7 @@ includes the "stable" instructions and excludes the "unstable" instructions.
 
 To use Delta-Debug, we need to write two scripts: \begin{itemize}
   \item A first script \texttt{ddRun <output\_dir>}, is responsible for running the program and writing its output inside the \texttt{<output\_dir>} folder.
-  \item A second script \texttt{ddCmp <reference\_dir> <current\_dir>}, is passed two folders containing the outputs from a reference run and the current run. The \texttt{ddCmp} script must return with success when the deviation between both runs is acceptable, and fail if the deviation is unnaceptable.
+  \item A second script \texttt{ddCmp <reference\_dir> <current\_dir>}, is passed two folders containing the outputs from a reference run and the current run. The \texttt{ddCmp} script must return with success when the deviation between both runs is acceptable, and fail if the deviation is unacceptable.
 \end{itemize}
 
 \begin{question}
@@ -137,7 +137,7 @@ $ cat dd.line/rddmin-cmp/dd.line.exclude
 0x0000000000400e89: archimedes at archimedes.c:17
 \end{verbatim}
 
-We observe that DD finds that instructions at line 16 and 17 are responsible for the output numerical unstability. To facilitate the debugging process we include a script that
+We observe that DD finds that instructions at line 16 and 17 are responsible for the output numerical instability. To facilitate the debugging process we include a script that
 transforms this output, into the error format used by compilers. Therefore we can use
 a standard IDE to pinpoint culprit instructions inside the code.
 
@@ -148,7 +148,7 @@ a standard IDE to pinpoint culprit instructions inside the code.
   \end{enumerate}
 \end{question}
 
-Line 17 points to a substraction operation (doublesub) between $s$ and $1$. One can see that as $T_{i+1}$ (\texttt{tii}) becomes smaller, $s$ becomes closer to $1$. Therefore it seems line 17 could trigger a catastrophic cancellation.
+Line 17 points to a subtraction operation (doublesub) between $s$ and $1$. One can see that as $T_{i+1}$ (\texttt{tii}) becomes smaller, $s$ becomes closer to $1$. Therefore it seems line 17 could trigger a catastrophic cancellation.
 
 To test this hypothesis we can use the pb mode with a high precision (such as
 60).  PB mode simulates cancellations. Using a precision higher than 53 means
@@ -176,7 +176,7 @@ Observe that,
           &= \frac{T_i}{\sqrt{T_i^2+1} + 1}
 \end{align*}
 
-The new formula is interesting since it eliminates the substraction that triggered the cancellation.
+The new formula is interesting since it eliminates the subtraction that triggered the cancellation.
 
 \begin{question}
   \begin{enumerate}[(a)]
