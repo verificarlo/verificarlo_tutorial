@@ -22,7 +22,7 @@
   }
 \end{figure}
 
-In this section we demonstrate how we can use Verificarlo to precisely localize a numerical bug in a program. The localization method is based on the Zeller's Delta-Debug reduction method~\cite{zeller2001automated}. Verificarlo uses the Interflop's stochastic Delta-Debug library by Bruno Lathuilière.
+In this section we demonstrate how we can use Verificarlo to precisely localize a numerical bug in a program. The localization method is based on the Zeller's Delta-Debug reduction method~\cite{zeller2001automated}. Verificarlo uses the Interflop's stochastic Delta-Debug library by Bruno Lathuilière and François Fevotte.
 
 In 200BC Archimedes proposed the first numerical method for computing $\pi$.
 Archimedes method uses one $6.n$-sided circumscribed polygon to the unit circle
@@ -31,13 +31,12 @@ whose area provides a lower bound for $\pi$.
 
 Here we will use the circumscribed polygon to approximate $\pi$.
 Figure~\ref{fig:archimedes} shows a 6-sided circumscribed polygon to the unit
-circle. Archimedes shows geometrically that the area of the polygons can be computed
-with the following recursive sequence,
+circle. Archimedes shows geometrically that the half-perimeter of the polygons (also converging to $\pi$) can be computed with the following recursive sequence,
 
 \begin{align*}
   T_1 &= \frac{1}{\sqrt{3}} \\
   T_{i+1} &= \frac{\sqrt{T_i^2+1} - 1}{T_i} \\
-  A_{i} &= 6 \times 2^{i-1} \times T_{i} \xrightarrow[i \to \infty]{} \pi
+  \frac{P_{i}}{2} &= 6 \times 2^{i-1} \times T_{i} \xrightarrow[i \to \infty]{} \pi
 \end{align*}
 
 In this part of the tutorial we will work inside the \texttt{archimedes/} folder.
@@ -48,16 +47,140 @@ In this part of the tutorial we will work inside the \texttt{archimedes/} folder
     \item The provided makefile builds the program using Verificarlo. Run the program
       with the IEEE backend (\texttt{libinterflop\_ieee.so}) and with the MCA backend
       (\texttt{libinterflop\_mca.so --precision 53}).
-    \item How many digits are significants in the computed result?
+    \item How many digits are significant in the computed result?
   \end{enumerate}
 \end{question}
 
+The previous experiment shows that computation becomes numerically unstable
+around iteration 15. Where is the error in the code? To help pinpointing the error,
+we are going to use Delta-Debug.
 
+Delta-Debug (DD) is a general bug reduction method that allows to efficiently find a
+minimal set of conditions that triger a bug. In this case, we are going to consider
+the set of floating-point instructions in the program. We are using DD to
+find a minimal set of instructions responsible for the instability in the output.
 
+\begin{table}[h]
+  \centering
+  \begin{tabular}{lcr}
+    Step & Instructions with MCA noise & Numerically Stable \\
+    \midrule
+    1    & 1 2 3 4 . . . . & stable \\
+    2    & . . . . 5 6 7 8 & unstable \\
+    \midrule
+    3    & . . . . 5 6 . . & stable \\
+    4    & . . . . . . 7 8 & unstable \\
+    \midrule
+    5    & . . . . . . 7 . & unstable \\
+    Result (ddmin) & . . . . . . 7 . & \\
+  \end{tabular}
+  \caption{Example of Delta-Debug bug minimization\label{tab:deltadebug}}
+\end{table}
 
+Table~\ref{tab:deltadebug} shows a simple DD execution to find a reduced
+instruction set responsible for a numerical instability. By testing
+instructions sub-sets and their complement, DD is able to find smaller failing
+sets step by step. DD stops when it finds a failing set where it cannot remove
+any instruction. In this case, DD is able to find a minimal failing set (ddmin)
+of size 1 (which is therefore also minimum). There is no guarantee of unicity.
 
+By default, Interflop's Delta-Debug implementation iterates to find all the
+possible different ddmin sets. At the end, it produces the rddmin-cmp set which
+is the complement of the union of the ddmin sets. The rddmin-cmp set therefore
+includes the "stable" instructions and excludes the "unstable" instructions.
 
+To use Delta-Debug, we need to write two scripts: \begin{itemize}
+  \item A first script \texttt{ddRun <output\_dir>}, is responsible for running the program and writing its output inside the \texttt{<output\_dir>} folder.
+  \item A second script \texttt{ddCmp <reference\_dir> <current\_dir>}, is passed two folders containing the outputs from a reference run and the current run. The \texttt{ddCmp} script must return with success when the deviation between both runs is acceptable, and fail if the deviation is unnaceptable.
+\end{itemize}
 
+\begin{question}
+  \begin{enumerate}[(a)]
+    \item Open the files \texttt{ddRun} and \texttt{ddCmp} and analyze how they work.
+  \end{enumerate}
+\end{question}
 
+\texttt{ddRun} a \texttt{ddCmp} depend on the user's application and the error tolerance
+of the application domain; therefore it is hard to provide a single script that fits all cases. That is why we require the user to manually write these scripts. Once the scripts
+are written, to launch a Delta-Debug session we use the following command,
 
+\begin{verbatim}
+VFC_BACKENDS="libinterflop_mca.so -p 53 -m mca" vfc_ddebug ddRun ddCmp
+\end{verbatim}
 
+where \texttt{VFC\_BACKENDS} specifies the noise model that will be used to
+simulate numerical errors. Here we provide a simple Makefile target that
+runs this command,
+\begin{verbatim}
+make dd MCA_MODE="-p 53 -m mca"
+\end{verbatim}
+
+\begin{question}
+  \begin{enumerate}[(a)]
+    \item Open the file \texttt{Makefile} and analyze the \texttt{make dd} target.
+    \item Run the \texttt{make dd} target.
+  \end{enumerate}
+\end{question}
+
+Now that you have run Delta-Debug, you can see it has found two minimal failing sets (ddmin0 and ddmin1). The sets outputs can be found in \texttt{dd.line/ddmin0} and \texttt{dd.line/ddmin1}. To see the "unstable" instructions belonging to each set open the  \texttt{dd.line/ddmin{0,1}/dd.line.include} files. We can also find the union of "unstable" instructions in the \texttt{dd.line/rddmin-cmp/dd.line.exclude} file.
+
+\begin{verbatim}
+$ cat dd.line/ddmin0/dd.line.include
+0x0000000000400e5c: archimedes at archimedes.c:16
+$ cat dd.line/ddmin1/dd.line.include
+0x0000000000400e89: archimedes at archimedes.c:17
+
+# We can also get the union of culprit instructions with
+
+$ cat dd.line/rddmin-cmp/dd.line.exclude
+0x0000000000400e5c: archimedes at archimedes.c:16
+0x0000000000400e89: archimedes at archimedes.c:17
+\end{verbatim}
+
+We observe that DD finds that instructions at line 16 and 17 are responsible for the output numerical unstability. To facilitate the debugging process we include a script that
+transforms this output, into the error format used by compilers. Therefore we can use
+a standard IDE to pinpoint culprit instructions inside the code.
+
+\begin{question}
+  \begin{enumerate}[(a)]
+    \item Run the \texttt{make dderrors} target. This should open a Vim session.
+    \item Type \texttt{:cw} to open the error quick-fix window. Use \texttt{:cn} and \texttt{:cp} to move to the next and previous "unstable" instructions.
+  \end{enumerate}
+\end{question}
+
+Line 17 points to a substraction operation (doublesub) between $s$ and $1$. One can see that as $T_{i+1}$ (\texttt{tii}) becomes smaller, $s$ becomes closer to $1$. Therefore it seems line 17 could trigger a catastrophic cancellation.
+
+To test this hypothesis we can use the pb mode with a high precision (such as
+60).  PB mode simulates cancellations. Using a precision higher than 53 means
+that only cancellations that cancel more than 7 bits will introduce errors.
+Using such a high-precision means we only introduce noise for strong
+cancellation but do not introduce noise in other kind of operations.
+
+\begin{question}
+  \begin{enumerate}[(a)]
+    \item Run Delta-Debug with a PB noise model at precision 60.
+      \begin{verbatim}
+make dd MCA_MODE="-m pb -p 60"
+      \end{verbatim}
+    \item Run \texttt{make dderrors}. How many "unstable" operations are detected?
+      Can you explain why line 16 was flagged as "unstable" in the previous run and not anymore?
+  \end{enumerate}
+\end{question}
+
+To fix this problem, we can try to rewrite the culprit expression in line 17.
+Observe that,
+
+\begin{align*}
+  T_{i+1} &= \frac{\sqrt{T_i^2+1} - 1}{T_i} = \frac{\sqrt{T_i^2+1} - 1}{T_i} \times \frac{\sqrt{T_i^2+1} + 1}{\sqrt{T_i^2+1} + 1} \\
+          &= \frac{(T_i^2 + 1) - 1}{T_i(\sqrt{T_i^2+1} + 1)} \\
+          &= \frac{T_i}{\sqrt{T_i^2+1} + 1}
+\end{align*}
+
+The new formula is interesting since it eliminates the substraction that triggered the cancellation.
+
+\begin{question}
+  \begin{enumerate}[(a)]
+    \item Modify \texttt{archimedes.c} to use the previous expression rewriting.
+    \item Study the numerical instability of the new version. Is the problem fixed?
+  \end{enumerate}
+\end{question}

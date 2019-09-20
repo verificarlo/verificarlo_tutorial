@@ -66,5 +66,5 @@ for x in $(seq 0.0 0.01 1.0); do
 done
 
 # Plot the samples
-python plot.py ${METHOD}-${REAL}.tab $VERIFICARLO_PRECISION&
+./plot.py ${METHOD}-${REAL}.tab $VERIFICARLO_PRECISION&
 exit

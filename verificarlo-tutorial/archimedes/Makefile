@@ -6,7 +6,7 @@ archimedes: archimedes.c
 
 dd: archimedes
 	rm -rf dd.line/
-	VFC_BACKENDS="libinterflop_mca.so ${MCA_MODE}" vfc_ddebug ddRun ddCmp.py
+	VFC_BACKENDS="libinterflop_mca.so ${MCA_MODE}" vfc_ddebug ddRun ddCmp
 
 dderrors: dd.line/rddmin-cmp/dd.line.exclude
 	bash -c "vim -q <(./vfc_dderrors.py archimedes $<)"

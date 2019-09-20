@@ -1,10 +1,10 @@
 /* Verificarlo Tutorial: Tchebychev Polynomial Evaluation */
 
-#include<assert.h>
-#include<stdlib.h>
-#include<stdio.h>
-#include<float.h>
-#include<string.h>
+#include <assert.h>
+#include <float.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
 /* Define real type and format string */
 #ifdef DOUBLE
@@ -16,29 +16,18 @@
 #endif
 
 /* Coefficients of the Tchebychev polynomial */
-REAL a[] = {
-  1.,
-  - 200.,
-  6600.,
-  - 84480.,
-  549120.,
-  - 2050048.,
-  4659200.,
-  - 6553600.,
-  5570560.,
-  -2621440.,
-  524288.
-};
+REAL a[] = {1.,       -200.,     6600.,    -84480.,   549120., -2050048.,
+            4659200., -6553600., 5570560., -2621440., 524288.};
 
 /* Expanded naïve implementation of the polynomial evaluation */
 /* D. Stott Parker, MCA, section 8.1.2 pp.52-54               */
 REAL expanded(REAL x) {
   REAL r = a[0];
-  REAL x2 = x*x;
+  REAL x2 = x * x;
   REAL p = x2;
 
   for (int i = 1; i <= 10; i++) {
-    r += a[i]*p;
+    r += a[i] * p;
     p *= x2;
   }
 
@@ -48,14 +37,14 @@ REAL expanded(REAL x) {
 /* Factored polynomial evaluation */
 REAL factored(REAL x) {
   REAL r = 0.0;
-  REAL x2 = x*x;
+  REAL x2 = x * x;
 
-  r = 8.0*x2;
+  r = 8.0 * x2;
   r *= (x - 1.0);
   r *= (x + 1.0);
-  r *= (4.0*x2 + 2.0*x - 1.0)*(4.0*x2 + 2.0*x - 1.0);
-  r *= (4.0*x2 - 2.0*x - 1.0)*(4.0*x2 - 2.0*x - 1.0);
-  r *= (16.0*x2*x2 - 20.0*x2 + 5.0)*(16.0*x2*x2 - 20.0*x2 + 5.0);
+  r *= (4.0 * x2 + 2.0 * x - 1.0) * (4.0 * x2 + 2.0 * x - 1.0);
+  r *= (4.0 * x2 - 2.0 * x - 1.0) * (4.0 * x2 - 2.0 * x - 1.0);
+  r *= (16.0 * x2 * x2 - 20.0 * x2 + 5.0) * (16.0 * x2 * x2 - 20.0 * x2 + 5.0);
   r += 1.0;
 
   return r;
@@ -64,10 +53,10 @@ REAL factored(REAL x) {
 /* Horner polynomial evaluation */
 REAL horner(REAL x) {
   REAL r = a[10];
-  REAL x2 = x*x;
+  REAL x2 = x * x;
 
   for (int i = 9; i >= 0; i--) {
-    r = r*x2 + a[i];
+    r = r * x2 + a[i];
   }
   return r;
 }
@@ -80,9 +69,9 @@ void usage(void) {
 }
 
 /* Main function */
-int main (int argc, char ** argv)
-{
-  if (argc != 3) usage();
+int main(int argc, char **argv) {
+  if (argc != 3)
+    usage();
   REAL x = atof(argv[1]);
   char *method = argv[2];
 
@@ -97,6 +86,6 @@ int main (int argc, char ** argv)
   else
     usage();
 
-  printf(FMT"\n", x, r);
+  printf(FMT "\n", x, r);
   return EXIT_SUCCESS;
 }

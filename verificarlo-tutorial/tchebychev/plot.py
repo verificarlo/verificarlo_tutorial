@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 
 ############################################################################
 # Plots mean (mu), standard deviation (sigma), and significant digits (s)  #
@@ -8,8 +8,14 @@
 import sys
 import re
 import numpy as np
+
+import matplotlib
+# Use Agg backend for headless runs
+matplotlib.use('Agg')
+
 import matplotlib.pyplot as plt
 import math
+
 
 # Read command line arguments
 if len(sys.argv) != 3 or not sys.argv[1].endswith('.tab'):
@@ -61,7 +67,7 @@ for x in x_values:
 
 
 # Plot all statistics
-plt.style.use('bmh')
+# plt.style.use('bmh')
 
 # Set title
 title=version + " verificarlo precision = " + prec_b + "bits"
@@ -93,5 +99,5 @@ plt.subplots_adjust(top=0.9)
 plotname=version+"-"+prec_b+".pdf"
 plt.savefig(plotname, format='pdf')
 
-# Show plot
-plt.show()
+# Show plot (disable on headless runs)
+# plt.show()
