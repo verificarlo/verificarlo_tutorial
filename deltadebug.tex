@@ -1,4 +1,4 @@
-\section{Pinpointing bugs with Delta-Debug: Archimedes method}
+\section{Pinpointing bugs with Delta-Debug: Archimedes' method}
 
 \begin{figure}[h]
   \centering
@@ -17,16 +17,16 @@
     }];
     \end{scope}
 \end{tikzpicture}
-  \caption{Archimedes method to approximate PI with a 6-sided circumscribed polygon.
+  \caption{Archimedes method to approximate $\pi$ with a 6-sided circumscribed polygon.
     \label{fig:archimedes}
   }
 \end{figure}
 
-In this section we demonstrate how we can use Verificarlo to precisely localize a numerical bug in a program. The localization method is based on the Zeller's Delta-Debug reduction method~\cite{zeller2001automated}. Verificarlo uses the Interflop's stochastic Delta-Debug library by Bruno Lathuilière and François Fevotte.
+In this section we demonstrate how we can use Verificarlo to precisely localize a numerical bug in a program. The localization method is based on the Zeller's Delta-Debug reduction method~\cite{zeller2001automated}. Verificarlo uses the Interflop's stochastic Delta-Debug library developped by Bruno Lathuilière and François Fevotte.
 
 In 200BC Archimedes proposed the first numerical method for computing $\pi$.
-Archimedes method uses one $6.n$-sided circumscribed polygon to the unit circle
-whose area provides an upper bound for $\pi$ and one $6.n$-sided inscribed polygon
+Archimedes method uses a $(6.n)$-sided circumscribed polygon to the unit circle
+whose area provides an upper bound for $\pi$ and a $(6.n)$-sided inscribed polygon
 whose area provides a lower bound for $\pi$.
 
 Here we will use the circumscribed polygon to approximate $\pi$.
@@ -82,7 +82,7 @@ instruction set responsible for a numerical instability. By testing
 instructions sub-sets and their complement, DD is able to find smaller failing
 sets step by step. DD stops when it finds a failing set where it cannot remove
 any instruction. In this case, DD is able to find a minimal failing set (ddmin)
-of size 1 (which is therefore also minimum). There is no guarantee of unicity.
+of size 1 (which is therefore also minimum). However, there is no guarantee of unicity.
 
 By default, Interflop's Delta-Debug implementation iterates to find all the
 possible different ddmin sets. At the end, it produces the rddmin-cmp set which
@@ -91,7 +91,7 @@ includes the "stable" instructions and excludes the "unstable" instructions.
 
 To use Delta-Debug, we need to write two scripts: \begin{itemize}
   \item A first script \texttt{ddRun <output\_dir>}, is responsible for running the program and writing its output inside the \texttt{<output\_dir>} folder.
-  \item A second script \texttt{ddCmp <reference\_dir> <current\_dir>}, is passed two folders containing the outputs from a reference run and the current run. The \texttt{ddCmp} script must return with success when the deviation between both runs is acceptable, and fail if the deviation is unacceptable.
+  \item A second script \texttt{ddCmp <reference\_dir> <current\_dir>}, takes as parameter two folders including respectively the outputs from a reference run and from the current run. The \texttt{ddCmp} script must return with a success when the deviation between the two runs is acceptable, and fail if the deviation is unacceptable.
 \end{itemize}
 
 \begin{question}
@@ -101,8 +101,8 @@ To use Delta-Debug, we need to write two scripts: \begin{itemize}
 \end{question}
 
 \texttt{ddRun} a \texttt{ddCmp} depend on the user's application and the error tolerance
-of the application domain; therefore it is hard to provide a single script that fits all cases. That is why we require the user to manually write these scripts. Once the scripts
-are written, to launch a Delta-Debug session we use the following command,
+of the application domain; therefore it is hard to provide a generic script that fits all cases. That is why we require the user to manually write these scripts. 
+Once the scripts are written, the Delta-Debug session is launched using the following command:
 
 \begin{verbatim}
 VFC_BACKENDS="libinterflop_mca.so -p 53 -m mca" vfc_ddebug ddRun ddCmp
@@ -122,7 +122,7 @@ make dd MCA_MODE="-p 53 -m mca"
   \end{enumerate}
 \end{question}
 
-Now that you have run Delta-Debug, you can see it has found two minimal failing sets (ddmin0 and ddmin1). The sets outputs can be found in \texttt{dd.line/ddmin0} and \texttt{dd.line/ddmin1}. To see the "unstable" instructions belonging to each set open the  \texttt{dd.line/ddmin{0,1}/dd.line.include} files. We can also find the union of "unstable" instructions in the \texttt{dd.line/rddmin-cmp/dd.line.exclude} file.
+Now that you have run Delta-Debug, you can observe that it has found two minimal failing sets (ddmin0 and ddmin1). The outputs sets are located in \texttt{dd.line/ddmin0} and \texttt{dd.line/ddmin1} directory. You can locate the "unstable" instructions belonging to each set by browsing the content of the \texttt{dd.line/ddmin{0,1}/dd.line.include} files. This information is also present in the \texttt{dd.line/rddmin-cmp/dd.line.exclude} file.
 
 \begin{verbatim}
 $ cat dd.line/ddmin0/dd.line.include
@@ -137,9 +137,7 @@ $ cat dd.line/rddmin-cmp/dd.line.exclude
 0x0000000000400e89: archimedes at archimedes.c:17
 \end{verbatim}
 
-We observe that DD finds that instructions at line 16 and 17 are responsible for the output numerical instability. To facilitate the debugging process we include a script that
-transforms this output, into the error format used by compilers. Therefore we can use
-a standard IDE to pinpoint culprit instructions inside the code.
+We can notice that instructions at line 16 and 17 found by DD method are responsible for the observed numerical instability. To ease the debugging process we include a script that transforms this output, into the error format used by compilers. Therefore we can use a standard IDE to pinpoint culprit instructions inside the code.
 
 \begin{question}
   \begin{enumerate}[(a)]
@@ -148,13 +146,12 @@ a standard IDE to pinpoint culprit instructions inside the code.
   \end{enumerate}
 \end{question}
 
-Line 17 points to a subtraction operation (doublesub) between $s$ and $1$. One can see that as $T_{i+1}$ (\texttt{tii}) becomes smaller, $s$ becomes closer to $1$. Therefore it seems line 17 could trigger a catastrophic cancellation.
+Line 17 points to a subtraction operation executed in double precision (doublesub) between $s$ and $1$. One can see that as $T_{i+1}$ (\texttt{tii}) becomes smaller, $s$ becomes closer to $1$. Therefore it looks like line 17 could trigger a catastrophic cancellation. (A similar conclusion can be done for Line 16 and the addition by $1$.
 
-To test this hypothesis we can use the pb mode with a high precision (such as
-60).  PB mode simulates cancellations. Using a precision higher than 53 means
-that only cancellations that cancel more than 7 bits will introduce errors.
-Using such a high-precision means we only introduce noise for strong
-cancellation but do not introduce noise in other kind of operations.
+In order to focus on catastrophic cancellation (and avoid small one that could rise too many "warning"), we have to use the PB mode with a higher precision than the working one (such as 60 for example). 
+Using a precision higher than 53 means that only cancellations that cancel more than 7 bits will introduce errors that will be reported in the result.
+%Using such a high-precision means we only introduce noise for strong
+%cancellation but do not introduce noise in other kind of operations.
 
 \begin{question}
   \begin{enumerate}[(a)]

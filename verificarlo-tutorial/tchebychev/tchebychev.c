@@ -9,10 +9,10 @@
 /* Define real type and format string */
 #ifdef DOUBLE
 #define REAL double
-#define FMT "%.16e %.16e"
+#define FMT "T(%.16e) = %.16e"
 #else
 #define REAL float
-#define FMT "%.7e %.7e"
+#define FMT "T(%.7e) = %.7e"
 #endif
 
 /* Coefficients of the Tchebychev polynomial */
