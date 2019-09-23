@@ -92,6 +92,7 @@ includes the "stable" instructions and excludes the "unstable" instructions.
 To use Delta-Debug, we need to write two scripts: \begin{itemize}
   \item A first script \texttt{ddRun <output\_dir>}, is responsible for running the program and writing its output inside the \texttt{<output\_dir>} folder.
   \item A second script \texttt{ddCmp <reference\_dir> <current\_dir>}, takes as parameter two folders including respectively the outputs from a reference run and from the current run. The \texttt{ddCmp} script must return with a success when the deviation between the two runs is acceptable, and fail if the deviation is unacceptable.
+    To decide if a given set is unstable, DD will run the program five times (the number of times can be changed by setting the environment variable \texttt{INTERFLOP\_DD\_NRUNS}).
 \end{itemize}
 
 \begin{question}
@@ -101,7 +102,7 @@ To use Delta-Debug, we need to write two scripts: \begin{itemize}
 \end{question}
 
 \texttt{ddRun} a \texttt{ddCmp} depend on the user's application and the error tolerance
-of the application domain; therefore it is hard to provide a generic script that fits all cases. That is why we require the user to manually write these scripts. 
+of the application domain; therefore it is hard to provide a generic script that fits all cases. That is why we require the user to manually write these scripts.
 Once the scripts are written, the Delta-Debug session is launched using the following command:
 
 \begin{verbatim}
@@ -146,12 +147,9 @@ We can notice that instructions at line 16 and 17 found by DD method are respons
   \end{enumerate}
 \end{question}
 
-Line 17 points to a subtraction operation executed in double precision (doublesub) between $s$ and $1$. One can see that as $T_{i+1}$ (\texttt{tii}) becomes smaller, $s$ becomes closer to $1$. Therefore it looks like line 17 could trigger a catastrophic cancellation. (A similar conclusion can be done for Line 16 and the addition by $1$.
+Line 17 points to a subtraction operation executed in double precision (doublesub) between $s$ and $1$. One can see that as $T_{i+1}$ (\texttt{tii}) becomes smaller, $s$ becomes closer to $1$. Therefore it looks like line 17 could trigger a catastrophic cancellation.
 
-In order to focus on catastrophic cancellation (and avoid small one that could rise too many "warning"), we have to use the PB mode with a higher precision than the working one (such as 60 for example). 
-Using a precision higher than 53 means that only cancellations that cancel more than 7 bits will introduce errors that will be reported in the result.
-%Using such a high-precision means we only introduce noise for strong
-%cancellation but do not introduce noise in other kind of operations.
+In order to focus on catastrophic cancellations (and avoid small ones that could rise too many false-positivies), we can use the PB mode with a higher precision than the working one (such as 60 for example). By using a precision of 60, the noise added to regular operations is absorbed after the final round operation; and only strong cancellation will propagate noise.
 
 \begin{question}
   \begin{enumerate}[(a)]
