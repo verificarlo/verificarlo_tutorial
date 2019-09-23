@@ -2,7 +2,7 @@
 
 Polynomial evaluation is a common source of computational error. Polynomials are frequently used for function interpolation in libraries or user codes. As we will see, different evaluations of the same polynomial do not have the same behavior in terms of performance or numerical accuracy.
 
-This tutorial is uses the following Tchebychev polynomial from ~\cite[pp.52-54]{parker1997monte}:
+This tutorial uses the Tchebychev polynomial from ~\cite[pp.52-54]{parker1997monte}:
 
 $$T(x)=\sum_{i=0}^{10}{a_i \times x^{2i}}$$
 With:
@@ -20,14 +20,13 @@ $a_i \in [
   524288
 ]$
 
-We are interested in evaluating  $T$ near $1$.
-This example is discussed with details in~\cite[pp.52-54]{parker1997monte}.
+We are interested in evaluating  $T$ near $1$ as discussed in~\cite[pp.52-54]{parker1997monte}.
 
-\subsection{Expanded form evaluation}
+\subsection{Evaluation of the naive form}
 
 \subsubsection{First steps with Verificarlo}
 
-In this first approach, we will evaluate the polynomial in its expanded form as given in the previous section. We first evaluate it in single precision. In this part of the tutorial we will work inside the \texttt{tchebychev/} folder.
+In this first approach, we will evaluate the polynomial in its naive form and in single precision. This part of the tutorial is located in the \texttt{tchebychev/} folder.
 
 \begin{question}
   \begin{enumerate}[(a)]
@@ -41,11 +40,9 @@ verificarlo -D FLOAT tchebychev.c -o tchebychev
   \end{enumerate}
 \end{question}
 
-When running the program it complains that at least one backend should be
-selected with the \texttt{VFC\_BACKENDS} environment variable.
-To run the program with standard IEEE-754 arithmetic one can use the simple
-IEEE backend (\texttt{libinterflop\_ieee.so}). The backend has a \texttt{-{}-debug}
-option that shows the floating-point operations that have been instrumented.
+You should get an error as the \texttt{VFC\_BACKENDS} environment variable is empty.
+The simplest backend is the one emulating IEEE-754 arithmetic(\texttt{libinterflop\_ieee.so}). 
+It has a \texttt{-{}-debug} option that trace each instrumented floating-point operations.
 
 \begin{question}
 Run the program using the IEEE backend,
@@ -54,13 +51,12 @@ VFC_BACKENDS="libinterflop_ieee.so --debug" ./tchebychev 0.99 EXPANDED
 \end{verbatim}
 \end{question}
 
-To evaluate the numerical error we will use the Monte Carlo arithmetic backend
-(\texttt{libinterflop\_mca.so}.  Because we are using IEEE-754 floats, to
-simulate round-off errors we should work at a 24 bits precision.
+To estimate the numerical error, we will now use the Monte Carlo Arithmetic backend
+(\texttt{libinterflop\_mca.so}) in single precision by simulating round-off errors that could occurs at 24 bits of precision.
 
 \begin{question}
   \begin{enumerate}[(a)]
-  \item Run the program using the Monte Carlo Arithmetic backend at 24 bits precision,
+  \item Run the program using the Monte Carlo Arithmetic backend with 24 bits precision,
 \begin{verbatim}
 VFC_BACKENDS="libinterflop_mca.so --precision=24" ./tchebychev 0.99 EXPANDED
 \end{verbatim}
@@ -73,7 +69,7 @@ Monte Carlo arithmetic backend supports different modes,
 
   \item \texttt{-{}-mode=rr} is the \emph{random round} mode that adds noise on the
     result of an operation only when the operation is not exactly representable
-    at the given precision. This mode is useful to simulate the effect of
+    at the chosen precision. This mode is useful to simulate the effect of
     round-off errors.
 
   \item \texttt{-{}-mode=pb} is the \emph{precision bound} mode that adds noise on
@@ -89,16 +85,15 @@ Monte Carlo arithmetic backend supports different modes,
   \begin{enumerate}[(a)]
   \item Now recompile with verificarlo the program in double precision using the command
     {\tt verificarlo -D DOUBLE tchebychev.c -o tchebychev} \\
-  \item Execute the program with arguments \texttt{0.99 EXPANDED} with the Monte Carlo arithmetic backend. Try different precisions such as 53, 24, 10. Try also to use different modes (rr, pb, mca).
+  \item Execute the program with arguments \texttt{0.99 EXPANDED} with the Monte Carlo arithmetic backend. Try different precisions such as 53, 24, 10. Try also to use different modes (rr, pb, mca). What do you observe ?
   \end{enumerate}
 \end{question}
 
 \subsubsection{Numerical quality analysis}
 
-In this section, we propose you to analyze the numerical quality of the results
-computed by the expanded evaluation of the polynomial. To simplify this task,
-you can use the script~\texttt{run.sh} which automates the required verificarlo
-runs. Visualization is done using the \texttt{plot.py} script.
+In this section, we analyze the numerical quality of the computed results based on the naive version of the given polynomial. 
+You can rely on the \texttt{run.sh} script available in the exercice directory which automates the required verificarlo runs. 
+Visualization is done using the \texttt{plot.py} script.
 
 Since we are working with a headless docker image, the \texttt{plot.py} output
 will be a \texttt{.pdf} file that you can open in the host machine.
@@ -107,50 +102,53 @@ will be a \texttt{.pdf} file that you can open in the host machine.
 \begin{question}
   \begin{enumerate}[(a)]
  \item Open {\tt run.sh} and understand how it works.
-  \item Modify {\tt run.sh} to evaluate the polynomial in the interval $[0.5,1]$ by $0.001$ step.
-  \item Open {\tt plot.py} and understand how it works, and what is the plotted data.
+  \item Modify {\tt run.sh} to evaluate the polynomial in the interval $[0.5,1]$ by $0.001$ step (you can leave the number of execution unchanged).
+  \item Open {\tt plot.py} and understand how it works, and what are the plotted data.
   \end{enumerate}
 \end{question}
 
-Figure~\ref{fig:expanded:double:24} is generated with the \texttt{plot.py} script.
+Figure~\ref{fig:exp_hor_24_53} are generated with the \texttt{plot.py} script.
 
-The lowest part are the $T(x)$ samples and their average in dotted line. The 20 Monte Carlo samples $T(x)$ are plotted for each $x$ value (sometime overlapping on the graphic)
+The lowest part of each plot are the $T(x)$ samples and their average in dotted line. The 20 Monte Carlo samples $T(x)$ are plotted for each $x$ value (sometime overlapping on the graphic)
 The central part is the empirical standard deviation $\hat\sigma$ for each value of $x$.
-The upper part of the figure represents the number $s$ of significant digits of each output: $s=-\log_{10}\left|\dfrac{\hat\sigma}{\hat\mu}\right|$ with $\hat\sigma$ the sample empirical standard deviation  $\hat\mu$ their average.
+We can focus on the upper part of the figure, as it represents the number $s$ of significant digits of each output: $s=-\log_{10}\left|\dfrac{\hat\sigma}{\hat\mu}\right|$ with $\hat\sigma$ the sample empirical standard deviation and $\hat\mu$ their average.
 
 \begin{question}
 \begin{enumerate}[(a)]
 \item To execute the {\tt EXPANDED} version with {\tt DOUBLE} and a virtual precision of 24 bits, execute the command: {\tt ./run.sh EXPANDED
-      DOUBLE 24 mca}. \newline This command's output is given in figure~\ref{fig:expanded:double:24}.
+      DOUBLE 24 mca}. \newline This command's output is given in figure~\ref{fig:exp_hor_24_53} (Top Left).
   \item With a virtual precision of 53, execute the command: {\tt ./run.sh EXPANDED DOUBLE 53 mca} \newline
-  This command's output is given in figure~\ref{fig:expanded:double:53}.
+  This command's output is given in figure~\ref{fig:exp_hor_24_53} (Top Right).
+  \item Compare the number $s$ of significant digits in both case. What is the problem and is double precision a solution ?  
   \end{enumerate}
 \end{question}
 
-\begin{figure}[h]
-\center \includegraphics[width=.8\textwidth]{EXPANDED-DOUBLE-24.pdf}
-  \caption{Evaluation of T(x) in its expanded form, compiled in double precision, with a virtual precision of 24}
-  \label{fig:expanded:double:24}
-\end{figure}
-\begin{figure}[h]
-\center \includegraphics[width=.8\textwidth]{EXPANDED-DOUBLE-53.pdf}
-  \caption{Evaluation of T(x) in its expanded form, compiled in double precision, with a virtual precision of 53}
-  \label{fig:expanded:double:53}
-\end{figure}
+\begin{table}
+\begin{tabular}{cc}
+\includegraphics[width=.47\textwidth]{EXPANDED-DOUBLE-24.pdf} &
+\includegraphics[width=.47\textwidth]{EXPANDED-DOUBLE-53.pdf} \\
+Expanded form, 24 bits & Expanded form, 53 bits \\ 
+\includegraphics[width=.47\textwidth]{HORNER-DOUBLE-24.pdf} &
+\includegraphics[width=.47\textwidth]{HORNER-DOUBLE-53.pdf} \\
+Horner form, 24 bits & Horner form, 53 bits \\
+\end{tabular}
+  \caption{Evaluation of T(x) in its \{Expanded/Horner\} form, compiled in double precision, with a virtual precision of \{24/53\} bits}
+  \label{fig:exp_hor_24_53}
+\end{table}
 
-Close to 1, the polynomial evaluation is subject to {\it cancellations} which
-rapidly decrease the result precision. The double precision on the contrary
-seems satisfactory.  However using double precision forces the programmer to
-use a larger and more costly data type and the cancellations still happen when
-getting closer to 1.  Nevertheless if the user is already using double
-precision number, and if the precision is still not satisfactory, how to solve
-the issue? Or what if our hardware only implements single precision?
+
+One can notice that the polynomial evaluation done with 24 bits is subject to severe {\it cancellations} when the input value is close to $1$.
+This drasticaly reduces the accuracy of the result. 
+Using evaluation in double precision on the contrary seems satisfactory...
+But this solution forces the developer to use a larger and more expensive data type and it does not solve the problem, it only delay it. 
+%Nevertheless if the user is already using double precision number, and if the precision is still not satisfactory, how to solve the issue? Or what if our hardware only implements single precision?
 
 \FloatBarrier
 
-\subsection{Evaluation using Horner scheme}
-
-Multiple ways to evaluate polynomials exist, using associativity, commutativity and factorization. More often they are explored for the sake of performance, but they also greatly influence the precision of the evaluation. One of them reputed to combine both performance and good numerical behavior is the Horner scheme which for our polynomial correspond to the following form:
+\subsection{Evaluation using Horner's method}
+There exists multiple ways to evaluate polynomials, using associativity, commutativity and factorization. 
+Each evaluation scheme has its own impact on precision and performance. 
+One of them has already been the subject of many studies: the Horner's method which for the considered polynomial take the following form:
 
 \[
 	T(x) = (\dots((a_n\times x^2 + a_{n-1})\times x^2 + a_{n-2})\dots) \times x^2
@@ -164,28 +162,19 @@ $$x^2+6600)*x^2-200)*x^2+1$$
 \begin{question}
   \begin{enumerate}[(a)]
   \item Open the file {\tt tchebychev.c} and have a look to the function {\tt REAL horner(REAL x)}
-\item While keeping previous execution parameters, execute the command {\tt ./run.sh HORNER DOUBLE 53 mca}.  \newline The output of this command is given in figure~\ref{fig:horner:double:53}.
+\item While keeping previous execution parameters, execute the command {\tt ./run.sh HORNER DOUBLE 53 mca}.  \newline The output of this command is given in figure~\ref{fig:exp_hor_24_53} (Bottom Left).
   \end{enumerate}
 \end{question}
 
 \begin{question}
 \item Execute the command {\tt ./run.sh HORNER DOUBLE 24 mca}  \newline
-The output of this command is given in figure~\ref{fig:horner:double:24}.
+The output of this command is given in figure~\ref{fig:exp_hor_24_53} (Bottom Right).
+What do you observe?
 \end{question}
 
-As shown in this experiment, the Horner scheme does not improve much the result
-precision ($\simeq$ 1 additional significant bit). However, it minimizes the
+As shown in this experiment, the improvment brought by the Horner scheme is not significant ($\simeq$ 1 additional significant bit in the result). 
+ However, it minimizes the
 number of operations and allows to use the FMA ({\it Fused Multiply Add}). For
 a polynomial of degree $n$, it produces $n-1$ FMA. Moreover, when doing
 multiple independent evaluations it can be vectorized.
 
-\begin{figure}[htb]
-\center \includegraphics[width=.8\textwidth]{HORNER-DOUBLE-53.pdf}
-  \caption{Evaluation of T(x) using Horner scheme, compiled in double precision, with a virtual precision of 53}
-  \label{fig:horner:double:53}
-\end{figure}
-\begin{figure}[htb]
-\center \includegraphics[width=.8\textwidth]{HORNER-DOUBLE-24.pdf}
-  \caption{Evaluation of T(x) using Horner scheme, compiled in double precision, with a virtual precision of 24}
-  \label{fig:horner:double:24}
-\end{figure}
