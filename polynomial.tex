@@ -138,7 +138,7 @@ Horner form, 24 bits & Horner form, 53 bits \\
 
 
 One can notice that the polynomial evaluation done with 24 bits is subject to severe {\it cancellations} when the input value is close to $1$.
-This drasticaly reduces the accuracy of the result. 
+This drasticaly reduces the accuracy of the result.
 Using evaluation in double precision on the contrary seems satisfactory...
 But this solution forces the developer to use a larger and more expensive data type and it does not solve the problem, it only delay it. 
 %Nevertheless if the user is already using double precision number, and if the precision is still not satisfactory, how to solve the issue? Or what if our hardware only implements single precision?
@@ -146,8 +146,8 @@ But this solution forces the developer to use a larger and more expensive data t
 \FloatBarrier
 
 \subsection{Evaluation using Horner's method}
-There exists multiple ways to evaluate polynomials, using associativity, commutativity and factorization. 
-Each evaluation scheme has its own impact on precision and performance. 
+There exists multiple ways to evaluate polynomials, using associativity, commutativity and factorization.
+Each evaluation scheme has its own impact on precision and performance.
 One of them has already been the subject of many studies: the Horner's method which for the considered polynomial take the following form:
 
 \[

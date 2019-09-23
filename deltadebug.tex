@@ -148,19 +148,38 @@ We can notice that instructions at line 16 and 17 found by DD method are respons
 \end{question}
 
 Line 17 points to a subtraction operation executed in double precision (doublesub) between $s$ and $1$. One can see that as $T_{i+1}$ (\texttt{tii}) becomes smaller, $s$ becomes closer to $1$. Therefore it looks like line 17 could trigger a catastrophic cancellation.
-
-In order to focus on catastrophic cancellations (and avoid small ones that could rise too many false-positivies), we can use the PB mode with a higher precision than the working one (such as 60 for example). By using a precision of 60, the noise added to regular operations is absorbed after the final round operation; and only strong cancellation will propagate noise.
+Let us do some experiments to confirm this hypothesis.
 
 \begin{question}
   \begin{enumerate}[(a)]
-    \item Run Delta-Debug with a PB noise model at precision 60.
+    \item Run Delta-Debug with a RR noise model at precision 53.
       \begin{verbatim}
-make dd MCA_MODE="-m pb -p 60"
+make dd MCA_MODE="-m rr -p 53"
       \end{verbatim}
-    \item Run \texttt{make dderrors}. How many "unstable" operations are detected?
-      Can you explain why line 16 was flagged as "unstable" in the previous run and not anymore?
   \end{enumerate}
 \end{question}
+
+With RR 53, only line 16 is flagged. Indeed the operation $T_i^2+1$ is inexact
+due to a round-off error ($T_i \ll 1$). The error then propagates and is amplified
+by the cancellation line 17.
+
+Interestingly, with RR the line 17 is not flagged; that is because RR 53 mode
+does not perturb cancellations which are exact operations. The fact that line
+17 disappears with RR mode hints that there is indeed a cancellation problem.
+
+\begin{question}
+  \begin{enumerate}[(a)]
+    \item Run Delta-Debug with a PB noise model at precision 53.
+      \begin{verbatim}
+make dd MCA_MODE="-m pb -p 53"
+      \end{verbatim}
+  \end{enumerate}
+\end{question}
+
+With PB noise model we see again that both line 16 and 17 are flagged.
+Therefore, we conclude that this program is affected both by a round-off error
+at line 16 and a cancellation error at line 17. The round-off error by itself
+is not problematic but is amplified by the cancellation.
 
 To fix this problem, we can try to rewrite the culprit expression in line 17.
 Observe that,
