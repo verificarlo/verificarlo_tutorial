@@ -1,14 +1,12 @@
 \subsection{BONUS: Compensated Horner's method}
-This section contains a Bonus exercice on the Compensated Horner's Method.
-The goal is to demonstrate how Verificarlo can be used to compare different evaluation methods and how it interact with numerical functions available through library calls.
- 
+This section corresponds to a Bonus exercice on the Compensated Horner's Method.
 
 "Compensated" algorithms belongs to the class of algorithms that increase
 program precision without changing the internal working format. 
 The goal is to capture for each operation an estimation of the error term and to reinject it into the result.
 For the Horner scheme, it is possible to retrieve at every step the error in
 $x^2$ and the addition of the next coefficient by using respectively the
-$Veltkamp-Dekker$ ({\tt twoProd}) for the product and $twoSum$ for the sum.
+$Veltkamp-Dekker$ {\tt TWOPROD} for the product and { \tt TWOSUM } for the sum.
 These algorithm are qualified as ({\it Error Free Transform}), EFT, in the
 literature. 
 The algorithm for the compensated horner scheme described in \cite{graillat2005compensated} is:
@@ -18,8 +16,8 @@ The algorithm for the compensated horner scheme described in \cite{graillat2005c
     \State {$s_n \gets a_n$}
     \State {$r_n \gets 0$}
     \For {$i \in [n-1:0]$}
-       \State $[p_i, pe_i] \gets \text{\sc TwoProd}(s_{i+1}, x^2)$
-       \State $[s_i, se_i] \gets \text{\sc TwoSum}(p_i, a_i)$
+       \State $[p_i, pe_i] \gets \text{\sc TWOPROD}(s_{i+1}, x^2)$
+       \State $[s_i, se_i] \gets \text{\sc TWOSUM}(p_i, a_i)$
        \State $r_i \gets r_{i+1}\times x^2+(pe_i+se_i)$
     \EndFor
     \State \Return $s_0 + r_0$
@@ -28,52 +26,20 @@ The algorithm for the compensated horner scheme described in \cite{graillat2005c
 
 The lines 5 and 6, evaluates HORNER with EFT calls. Line 7 accumulate the error terms, which will be added to the final result in line 9.
 
+We provide implementations for EFT in the {\tt libeft.c} and {\tt libeft.h} files.
+
 \begin{question}
   \begin{enumerate}[(a)]
-    \item Modify {\tt run.sh} to call comphorner with the following command: {\tt ./run.sh COMPHORNER FLOAT 24 }.
+    \item Implement comphorner algorithm in {\tt tchebychev.c} using the EFT implementations in {\tt eft.h}.
+    \item Modify {\tt run.sh} to also compile eft.c with verificarlo.
+    \item Run comphorner with the following command: {\tt ./run.sh COMPHORNER FLOAT 24 rr}.
+    \item Run comphorner with the following command: {\tt ./run.sh COMPHORNER DOUBLE 53 rr}.
+    \item What happens if you use a precision different from 53 for program compiled in DOUBLE precision?
+      $\Rightarrow$ WARNING, {\sc TWOPROD} and {\sc TWOSUM} relies on exact operations; it is essential to use RR 53 (Random Rounding with precision 53) mode of verificarlo for  \texttt{double} or RR 24 for \texttt{float}.
+      \\~\\
+      You should get the results in table~\ref{fig:comphornerVerificarlo24_53}.
+
   \end{enumerate}
-\end{question}
-
-Instead of (carefully) recoding EFTs {\sc TwoProd} and {\sc TwoSum} manually, we suggest to use {\tt libeft}~\cite{libeft} available and documented at the following address: \url{https://github.com/ffevotte/libeft}.
-
-\begin{question}
-  \begin{enumerate}[(a)]
-    \item Modify {\tt run.sh} to add libeft to the linker command. For this, just add {\tt -left} to verificarlo command and ensure that libeft path is in your  {\tt LIBRARY\_PATH}.
-    \item Modify {\tt tchebychev.c} following that example:
-
-      {
-      \begin{lstlisting}[style=customC, basicstyle=\normalsize]
-      #include <libeft.h>
-
-      /* Define real type and format string */
-      #ifdef DOUBLE
-      #define REAL double
-      #define FMT "%.16e %.16e"
-      #define TWOPROD twoprod_d
-      #define TWOSUM  twosum_d
-      #else
-      #define REAL float
-      #define FMT "%.7e %.7e"
-      #define TWOPROD twoprod_s
-      #define TWOSUM  twosum_s
-      #endif
-      \end{lstlisting}
-      }
-
-     These modifications allow defining two macros corresponding to  {\tt TWOPROD} and {\tt TWOSUM} calling the EFT version according to the floating point format you are using.
-
-
-    \item Implement {\tt REAL compHorner(REAL x)} in {\tt tchebychev.c} according to the comphorner algorithm provided in this tutorial. Modify the {\tt main} function to allow calling comphorner.
-    \end{enumerate}
-\end{question}
-
-
-\begin{question}
-  Evaluate {\tt compHorner} precision with Verificarlo. What happens if you use a precision different from 53 for program compiled in DOUBLE precision?
-
-  $\Rightarrow$ WARNING, {\sc TwoProd} and {\sc TwoSum} relies on exact operations; it is essential to use RR 53 (Random Rounding with precision 53) mode of verificarlo for  \texttt{double} or RR 24 for \texttt{float}.
-  \\~\\
-  You should get the results of figures~\ref{fig:comphornerVerificarlo24_53}.
 \end{question}
 
 
@@ -87,7 +53,7 @@ Instead of (carefully) recoding EFTs {\sc TwoProd} and {\sc TwoSum} manually, we
 \end{table}
 
 
-The resulting precision of this approach are given in figures~\ref{fig:comphornerVerificarlo24_53} with verificarlo. 
+The resulting precision of this approach are given in table~\ref{fig:comphornerVerificarlo24_53} with verificarlo.
 Filled circles represent the real error value (evaluating in rational arithmetic in Python); circles represent the quality of the result computed in Monte Carlo Arithmetic with Verificarlo~\cite{verrou}.
 
 We can notice on these figures that CompHorner compensate precision losses in double and single precision. We retrieve a behavior similar to the factored form, in particularly for points $T(x)=1$. However, knowing the polynomial's roots for using the Horner scheme is not required.
@@ -96,5 +62,3 @@ Out of these plots, we can make two interesting observations.
 First, at the cost of an increasing number of operations, (but generally in the same complexity class) it is possible to recover a part (or the full) precision losses. There are algorithms called "accurate" that compute result without loss of precision, by, for example, recursively keeping errors terms until they can not be represented in the final result and such that rounding is correct ({\it e.g.} $accSum$ of S. Hump).
 
 Second, some algorithms, especially in mathematical libraries (libmath, Intel MKL, Intel VML, libeft) used particularity of the floating-point format. By using Monte Carlo Arithmetic, it can be difficult even impossible to analyze them. In the random rounding specific case (as implemented by verificarlo RR mode with a precision length(mantissa)+1), a large amount of compensated algorithms can be analyzed (including compHorner as seen before). In addition, by their design, these algorithms have a proof of their level's precision correctness, which makes their evaluation by empirical methods useless.
-
-
