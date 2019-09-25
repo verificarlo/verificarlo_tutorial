@@ -107,7 +107,7 @@ will be a \texttt{.pdf} file that you can open in the host machine.
   \end{enumerate}
 \end{question}
 
-Figure~\ref{fig:exp_hor_24_53} is generated with the \texttt{plot.py} script.
+Table~\ref{fig:exp_hor_24_53} is generated with the \texttt{plot.py} script.
 
 The lowest part of each plot shows the $T(x)$ samples and their average in dotted line. The 20 Monte Carlo samples $T(x)$ are plotted for each $x$ value (sometime overlapping on the graphic).
 The central part is the empirical standard deviation $\hat\sigma$ for each value of $x$.
@@ -116,9 +116,9 @@ The upper part of the figure represents the number $s$ of significant digits of 
 \begin{question}
 \begin{enumerate}[(a)]
 \item To execute the {\tt EXPANDED} version with {\tt DOUBLE} and a virtual precision of 24 bits, execute the command: {\tt ./run.sh EXPANDED
-      DOUBLE 24 mca} \newline This command's output is given in figure~\ref{fig:exp_hor_24_53} (Top Left).
+      DOUBLE 24 mca} \newline This command's output is given in table~\ref{fig:exp_hor_24_53} (Top Left).
   \item With a virtual precision of 53, execute the command: {\tt ./run.sh EXPANDED DOUBLE 53 mca} \newline
-  This command's output is given in figure~\ref{fig:exp_hor_24_53} (Top Right).
+  This command's output is given in table~\ref{fig:exp_hor_24_53} (Top Right).
   \item Compare the number $s$ of significant digits in both case. What is the problem and is double precision a solution?
   \end{enumerate}
 \end{question}
@@ -161,13 +161,13 @@ $$x^2+6600)*x^2-200)*x^2+1$$
 \begin{question}
   \begin{enumerate}[(a)]
   \item Open the file {\tt tchebychev.c} and have a look to the function {\tt REAL horner(REAL x)}
-\item While keeping previous execution parameters, execute the command {\tt ./run.sh HORNER DOUBLE 53 mca}  \newline The output of this command is given in figure~\ref{fig:exp_hor_24_53} (Bottom Left).
+\item While keeping previous execution parameters, execute the command {\tt ./run.sh HORNER DOUBLE 53 mca}  \newline The output of this command is given in table~\ref{fig:exp_hor_24_53} (Bottom Left).
   \end{enumerate}
 \end{question}
 
 \begin{question}
 \item Execute the command {\tt ./run.sh HORNER DOUBLE 24 mca}  \newline
-The output of this command is given in figure~\ref{fig:exp_hor_24_53} (Bottom Right).
+The output of this command is given in table~\ref{fig:exp_hor_24_53} (Bottom Right).
 What do you observe?
 \end{question}
 
