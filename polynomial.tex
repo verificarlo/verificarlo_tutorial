@@ -83,9 +83,9 @@ Monte Carlo arithmetic backend supports different modes,
 
 \begin{question}
   \begin{enumerate}[(a)]
-  \item Now recompile with verificarlo the program in double precision using the command
+  \item Now recompile with verificarlo the program in double precision using the command:\newline
     {\tt verificarlo -D DOUBLE tchebychev.c -o tchebychev} \\
-  \item Execute the program with arguments \texttt{0.99 EXPANDED} with the Monte Carlo arithmetic backend. Try different precisions such as 53, 24, 10. Try also to use different modes (rr, pb, mca). What do you observe ?
+  \item Execute the program with arguments \texttt{0.99 EXPANDED} with the Monte Carlo arithmetic backend. Try different precisions such as 53, 24, 10. Try also to use different modes (rr, pb, mca). What do you observe?
   \end{enumerate}
 \end{question}
 
@@ -107,19 +107,19 @@ will be a \texttt{.pdf} file that you can open in the host machine.
   \end{enumerate}
 \end{question}
 
-Figure~\ref{fig:exp_hor_24_53} are generated with the \texttt{plot.py} script.
+Figure~\ref{fig:exp_hor_24_53} is generated with the \texttt{plot.py} script.
 
-The lowest part of each plot are the $T(x)$ samples and their average in dotted line. The 20 Monte Carlo samples $T(x)$ are plotted for each $x$ value (sometime overlapping on the graphic)
+The lowest part of each plot shows the $T(x)$ samples and their average in dotted line. The 20 Monte Carlo samples $T(x)$ are plotted for each $x$ value (sometime overlapping on the graphic).
 The central part is the empirical standard deviation $\hat\sigma$ for each value of $x$.
-We can focus on the upper part of the figure, as it represents the number $s$ of significant digits of each output: $s=-\log_{10}\left|\dfrac{\hat\sigma}{\hat\mu}\right|$ with $\hat\sigma$ the sample empirical standard deviation and $\hat\mu$ their average.
+The upper part of the figure represents the number $s$ of significant digits of each output: $s=-\log_{10}\left|\dfrac{\hat\sigma}{\hat\mu}\right|$ with $\hat\sigma$ the sample empirical standard deviation and $\hat\mu$ their average.
 
 \begin{question}
 \begin{enumerate}[(a)]
 \item To execute the {\tt EXPANDED} version with {\tt DOUBLE} and a virtual precision of 24 bits, execute the command: {\tt ./run.sh EXPANDED
-      DOUBLE 24 mca}. \newline This command's output is given in figure~\ref{fig:exp_hor_24_53} (Top Left).
+      DOUBLE 24 mca} \newline This command's output is given in figure~\ref{fig:exp_hor_24_53} (Top Left).
   \item With a virtual precision of 53, execute the command: {\tt ./run.sh EXPANDED DOUBLE 53 mca} \newline
   This command's output is given in figure~\ref{fig:exp_hor_24_53} (Top Right).
-  \item Compare the number $s$ of significant digits in both case. What is the problem and is double precision a solution ?  
+  \item Compare the number $s$ of significant digits in both case. What is the problem and is double precision a solution?
   \end{enumerate}
 \end{question}
 
@@ -127,10 +127,10 @@ We can focus on the upper part of the figure, as it represents the number $s$ of
 \begin{tabular}{cc}
 \includegraphics[width=.47\textwidth]{EXPANDED-DOUBLE-24.pdf} &
 \includegraphics[width=.47\textwidth]{EXPANDED-DOUBLE-53.pdf} \\
-Expanded form, 24 bits & Expanded form, 53 bits \\ 
+%Expanded form, 24 bits & Expanded form, 53 bits \\
 \includegraphics[width=.47\textwidth]{HORNER-DOUBLE-24.pdf} &
 \includegraphics[width=.47\textwidth]{HORNER-DOUBLE-53.pdf} \\
-Horner form, 24 bits & Horner form, 53 bits \\
+%Horner form, 24 bits & Horner form, 53 bits \\
 \end{tabular}
   \caption{Evaluation of T(x) in its \{Expanded/Horner\} form, compiled in double precision, with a virtual precision of \{24/53\} bits}
   \label{fig:exp_hor_24_53}
@@ -140,8 +140,7 @@ Horner form, 24 bits & Horner form, 53 bits \\
 One can notice that the polynomial evaluation done with 24 bits is subject to severe {\it cancellations} when the input value is close to $1$.
 This drasticaly reduces the accuracy of the result.
 Using evaluation in double precision on the contrary seems satisfactory...
-But this solution forces the developer to use a larger and more expensive data type and it does not solve the problem, it only delay it. 
-%Nevertheless if the user is already using double precision number, and if the precision is still not satisfactory, how to solve the issue? Or what if our hardware only implements single precision?
+But this solution forces the developer to use a larger and more expensive data type and it does not solve the problem, it only delays it.
 
 \FloatBarrier
 
@@ -162,7 +161,7 @@ $$x^2+6600)*x^2-200)*x^2+1$$
 \begin{question}
   \begin{enumerate}[(a)]
   \item Open the file {\tt tchebychev.c} and have a look to the function {\tt REAL horner(REAL x)}
-\item While keeping previous execution parameters, execute the command {\tt ./run.sh HORNER DOUBLE 53 mca}.  \newline The output of this command is given in figure~\ref{fig:exp_hor_24_53} (Bottom Left).
+\item While keeping previous execution parameters, execute the command {\tt ./run.sh HORNER DOUBLE 53 mca}  \newline The output of this command is given in figure~\ref{fig:exp_hor_24_53} (Bottom Left).
   \end{enumerate}
 \end{question}
 

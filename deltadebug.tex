@@ -22,7 +22,7 @@
   }
 \end{figure}
 
-In this section we demonstrate how we can use Verificarlo to precisely localize a numerical bug in a program. The localization method is based on the Zeller's Delta-Debug reduction method~\cite{zeller2001automated}. Verificarlo uses the Interflop's stochastic Delta-Debug library developped by Bruno Lathuilière and François Fevotte.
+In this section we demonstrate how we can use Verificarlo to precisely localize a numerical bug in a program. The localization method is based on the Zeller's Delta-Debug reduction method~\cite{zeller2001automated}. Verificarlo uses the Interflop's stochastic Delta-Debug library~\cite{verrou,interflop}.
 
 In 200BC Archimedes proposed the first numerical method for computing $\pi$.
 Archimedes method uses a $(6.n)$-sided circumscribed polygon to the unit circle
@@ -101,7 +101,7 @@ To use Delta-Debug, we need to write two scripts: \begin{itemize}
   \end{enumerate}
 \end{question}
 
-\texttt{ddRun} a \texttt{ddCmp} depend on the user's application and the error tolerance
+\texttt{ddRun} and \texttt{ddCmp} depend on the user's application and the error tolerance
 of the application domain; therefore it is hard to provide a generic script that fits all cases. That is why we require the user to manually write these scripts.
 Once the scripts are written, the Delta-Debug session is launched using the following command:
 
@@ -123,7 +123,7 @@ make dd MCA_MODE="-p 53 -m mca"
   \end{enumerate}
 \end{question}
 
-Now that you have run Delta-Debug, you can observe that it has found two minimal failing sets (ddmin0 and ddmin1). The outputs sets are located in \texttt{dd.line/ddmin0} and \texttt{dd.line/ddmin1} directory. You can locate the "unstable" instructions belonging to each set by browsing the content of the \texttt{dd.line/ddmin{0,1}/dd.line.include} files. This information is also present in the \texttt{dd.line/rddmin-cmp/dd.line.exclude} file.
+Now that you have run Delta-Debug, you can observe that it has found two minimal failing sets (ddmin0 and ddmin1). The outputs sets are located in \texttt{dd.line/ddmin0} and \texttt{dd.line/ddmin1} directory. You can locate the "unstable" instructions belonging to each set by browsing the content of the \texttt{dd.line/ddmin\{0,1\}/dd.line.include} files. This information is also present in the \texttt{dd.line/rddmin-cmp/dd.line.exclude} file.
 
 \begin{verbatim}
 $ cat dd.line/ddmin0/dd.line.include
