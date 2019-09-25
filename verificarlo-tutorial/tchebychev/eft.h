@@ -7,17 +7,17 @@
 #define __EFT_H__
 
 #ifdef DOUBLE
-#define TWOPROD my_twoprod_d
-#define TWOSUM my_twosum_d
+#define TWOPROD twoprod_d
+#define TWOSUM twosum_d
 #else
-#define TWOPROD my_twoprod_s
-#define TWOSUM my_twosum_s
+#define TWOPROD twoprod_s
+#define TWOSUM twosum_s
 #endif
 
-void my_twosum_s(float a, float b, float *x, float *e);
-void my_twoprod_s(float a, float b, float *x, float *e);
+void twosum_s(float a, float b, float *x, float *e);
+void twoprod_s(float a, float b, float *x, float *e);
 
-void my_twosum_d(double a, double b, double *x, double *e);
-void my_twoprod_d(double a, double b, double *x, double *e);
+void twosum_d(double a, double b, double *x, double *e);
+void twoprod_d(double a, double b, double *x, double *e);
 
 #endif

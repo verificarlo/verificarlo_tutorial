@@ -43,7 +43,7 @@ esac
 echo "Verificarlo Precision = $VERIFICARLO_PRECISION, Real Type = $REAL, Method = $METHOD"
 
 # Compile source code with verificarlo (BONUS EXERCICE: for COMPHORNER include eft.c here)
-verificarlo -D ${REAL} tchebychev.c -o tchebychev.o
+verificarlo -D ${REAL} tchebychev.c -o tchebychev
 
 # Run 20 iterations of tchebychev for all values x in [.5:1.0:.001]
 # producing a .tab file with three columns:
