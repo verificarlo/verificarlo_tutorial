@@ -34,10 +34,7 @@ prec_dec=float(prec_b)*math.log(2, 10)
 #   - i: sample number
 #   - x: input value
 #   - T: polynomial evaluation on x, T(x)
-D = np.loadtxt(fname,
-        skiprows=1,
-        usecols=(0,1,3),
-        converters = {1: lambda s: float(s[2:-1])},
+D = np.loadtxt(fname, skiprows=1,
         dtype = dict(names=('i', 'x', 'T'),
                      formats=('i4', 'f8', 'f8')))
 

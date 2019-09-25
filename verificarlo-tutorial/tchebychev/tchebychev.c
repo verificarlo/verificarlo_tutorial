@@ -6,13 +6,15 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "eft.h"
+
 /* Define real type and format string */
 #ifdef DOUBLE
 #define REAL double
-#define FMT "T(%.16e) = %.16e"
+#define FMT "%.16e %.16e"
 #else
 #define REAL float
-#define FMT "T(%.7e) = %.7e"
+#define FMT "%.7e %.7e"
 #endif
 
 /* Coefficients of the Tchebychev polynomial */
@@ -61,9 +63,29 @@ REAL horner(REAL x) {
   return r;
 }
 
+/* BONUS EXERCICE:
+ * Compensated Horner polynomial evaluation
+ */
+REAL compHorner(REAL x) {
+  REAL r = a[10];
+  REAL x2 = x*x;
+  REAL s = 0;
+
+  for (int i = 9 ; i >= 0 ; i--) {
+	// TODO:
+	// 1) Declare necessary variables to store intermediate calculation of error
+	// 2) Replace addition and multiplication by the EFT (TWOPROD & TWOSUM)
+	//  Do not forget to propagate the error term (s) form one iteration to the other
+	//  and in the final results.
+    r = r * x2 + a[i];
+  }
+  return r+s;
+}
+
+
 /* usage: fails with usage message */
 void usage(void) {
-  fprintf(stderr, "usage: tchebychev x [EXPANDED | HORNER | FACTORED]\n"
+  fprintf(stderr, "usage: tchebychev x [EXPANDED | HORNER | FACTORED | COMPHORNER]\n"
                   "       x is a floating point value\n");
   exit(EXIT_FAILURE);
 }
@@ -83,6 +105,8 @@ int main(int argc, char **argv) {
     r = horner(x);
   else if (strcmp(method, "FACTORED") == 0)
     r = factored(x);
+  else if (strcmp(method, "COMPHORNER") == 0)
+    r = compHorner(x);
   else
     usage();
 

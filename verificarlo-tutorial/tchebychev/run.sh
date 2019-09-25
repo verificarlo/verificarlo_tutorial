@@ -30,13 +30,6 @@ case "${METHOD}" in
 	exit 1
 esac
 
-# Remove this block when you implement COMPHORNER
-if  [[ "${METHOD}" == "COMPHORNER" ]];
-then
-  echo "COMPHORNER is not implemented"
-  exit 1
-fi
-
 # Check real
 case "${REAL}" in
     FLOAT) ;;
@@ -49,8 +42,8 @@ esac
 # Print options
 echo "Verificarlo Precision = $VERIFICARLO_PRECISION, Real Type = $REAL, Method = $METHOD"
 
-# Compile source code with verificarlo
-verificarlo -D ${REAL} tchebychev.c -o tchebychev
+# Compile source code with verificarlo (BONUS EXERCICE: for COMPHORNER include eft.c here)
+verificarlo -D ${REAL} tchebychev.c -o tchebychev.o
 
 # Run 20 iterations of tchebychev for all values x in [.5:1.0:.001]
 # producing a .tab file with three columns:
