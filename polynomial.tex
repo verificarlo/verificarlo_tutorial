@@ -56,13 +56,15 @@ To estimate the numerical error, we will now use the Monte Carlo Arithmetic back
 
 \begin{question}
   \begin{enumerate}[(a)]
-  \item Run the program using the Monte Carlo Arithmetic backend with 24 bits precision,
+  \item Run the program using the Monte Carlo Arithmetic backend with 24 bits precision for single precision variables,
 \begin{verbatim}
-VFC_BACKENDS="libinterflop_mca.so --precision=24" ./tchebychev 0.99 EXPANDED
+VFC_BACKENDS="libinterflop_mca.so --precision-binary32=24" ./tchebychev 0.99 EXPANDED
 \end{verbatim}
   \item Execute the program multiple times. What can you observe?
   \end{enumerate}
 \end{question}
+
+The Monte Carlo Arithmetic backend define precision (i.e. noise level) for single and double precision variable by respectively using the  \texttt{-{}-precision-binary32=<value>} and \texttt{-{}-precision-binary32=<value>} 
 
 Monte Carlo arithmetic backend supports different modes,
 \begin{itemize}
@@ -91,7 +93,7 @@ Monte Carlo arithmetic backend supports different modes,
 
 \subsubsection{Numerical quality analysis}
 
-In this section, we analyze the numerical quality of the computed results based on the naive version of the given polynomial. 
+ In this section, we analyze the numerical quality of the computed results based on the naive version of the given polynomial. 
 You can rely on the \texttt{run.sh} script available in the exercice directory which automates the required verificarlo runs. 
 Visualization is done using the \texttt{plot.py} script.
 

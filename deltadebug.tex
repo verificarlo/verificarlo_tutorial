@@ -106,14 +106,14 @@ of the application domain; therefore it is hard to provide a generic script that
 Once the scripts are written, the Delta-Debug session is launched using the following command:
 
 \begin{verbatim}
-VFC_BACKENDS="libinterflop_mca.so -p 53 -m mca" vfc_ddebug ddRun ddCmp
+VFC_BACKENDS="libinterflop_mca.so --precision-binary64=53 -m mca" vfc_ddebug ddRun ddCmp
 \end{verbatim}
 
 where \texttt{VFC\_BACKENDS} specifies the noise model that will be used to
 simulate numerical errors. Here we provide a simple Makefile target that
 runs this command,
 \begin{verbatim}
-make dd MCA_MODE="-p 53 -m mca"
+make dd MCA_MODE="--precision-binary64=53 -m mca"
 \end{verbatim}
 
 \begin{question}
@@ -154,7 +154,7 @@ Let us do some experiments to confirm this hypothesis.
   \begin{enumerate}[(a)]
     \item Run Delta-Debug with a RR noise model at precision 53.
       \begin{verbatim}
-make dd MCA_MODE="-m rr -p 53"
+make dd MCA_MODE="-m rr --precision-binary64=53"
       \end{verbatim}
   \end{enumerate}
 \end{question}
@@ -171,7 +171,7 @@ does not perturb cancellations which are exact operations. The fact that line
   \begin{enumerate}[(a)]
     \item Run Delta-Debug with a PB noise model at precision 53.
       \begin{verbatim}
-make dd MCA_MODE="-m pb -p 53"
+make dd MCA_MODE="-m pb --precision-binary64=53"
       \end{verbatim}
   \end{enumerate}
 \end{question}
