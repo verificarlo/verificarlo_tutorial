@@ -48,6 +48,9 @@ echo "Verificarlo Precision = $VERIFICARLO_PRECISION, Real Type = $REAL, Method 
 # Compile source code with verificarlo
 verificarlo -D ${REAL} tchebychev.c -o tchebychev -left
 
+#gcc -D${REAL} tchebychev.c -o tchebychev-ieee -left
+
+
 # Run 20 iterations of tchebychev for all values x in [.5:1.0:.001]
 # producing a .tab file with three columns:
 #   - i: sample number
@@ -62,6 +65,7 @@ for x in $(seq 0.99 0.00001 1.0); do
       echo $i $(./tchebychev $x $METHOD) >> ${METHOD}-${REAL}.tab
     done
 done
+
 
 # Plot the samples
 python3 plot.py ${METHOD}-${REAL}.tab $VERIFICARLO_PRECISION
