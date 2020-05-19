@@ -50,6 +50,10 @@ verificarlo -D ${REAL} tchebychev.c -o tchebychev -left
 
 #gcc -D${REAL} tchebychev.c -o tchebychev-ieee -left
 
+#for x in $(seq 0.5 0.001 1.0); do
+#    ./tchebychev-ieee $x $METHOD
+#done >${METHOD}_${REAL}
+#python tchebychev.py $METHOD ${REAL}&
 
 # Run 20 iterations of tchebychev for all values x in [.5:1.0:.001]
 # producing a .tab file with three columns:
