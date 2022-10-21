@@ -114,14 +114,14 @@ precisions. The option for setting a preset is {\tt --preset=PRESET}.
         \item Compile and run the benchmark using single precision without verificarlo
               \begin{verbatim}
 clang -D FLOAT -o reference tchebychev.c
-./reference 0.6 FACTORED
-6.0000002e-01 9.5425093e-01
+./reference 0.75 FACTORED
+7.5000000e-01 -3.1220961e-01
 \end{verbatim}
         \item Now compile it using double precision with verificarlo
               \begin{verbatim}
 verificarlo -D DOUBLE -o tchebychev tchebychev.c
-VFC_BACKENDS="libinterflop_vprec.so --preset=binary32" ./tchebychev 0.6 FACTORED 
-5.9999999999999998e-01 9.5425069332122803e-01
+VFC_BACKENDS="libinterflop_vprec.so --preset=binary32" ./tchebychev 0.75 FACTORED 
+7.5000000000000000e-01 -3.1220960617065430e-01
 \end{verbatim}
         \item Compare the mantissas between the two previous runs. Observe that VPREC has accurately emulated binary32 (FLOAT) format.
     \end{enumerate}
@@ -131,13 +131,13 @@ VFC_BACKENDS="libinterflop_vprec.so --preset=binary32" ./tchebychev 0.6 FACTORED
     \begin{enumerate}[(a)]
         \item You can emulate the effect of bfloat16 using
               \begin{verbatim}
-VFC_BACKENDS="libinterflop_vprec.so --preset=bfloat16" ./tchebychev 0.6 FACTORED 
-5.9999999999999998e-01 9.5312500000000000e-01
+VFC_BACKENDS="libinterflop_vprec.so --preset=bfloat16" ./tchebychev 0.75 FACTORED 
+7.5000000000000000e-01 -3.1250000000000000e-01
 \end{verbatim}
-        \item You can also emulate a custom precision, such as 10 bits, with
+        \item You can also emulate a custom precision, such as 12 bits, with
               \begin{verbatim}
-VFC_BACKENDS="libinterflop_vprec.so --precision-binary64=10" ./tchebychev 0.6 FACTORED 
-5.9999999999999998e-01 9.5263671875000000e-01
+VFC_BACKENDS="libinterflop_vprec.so --precision-binary64=12" ./tchebychev 0.75 FACTORED 
+7.5000000000000000e-01 -3.1225585937500000e-01
 \end{verbatim}
         \item Try different precisions, at which threshold does the computation looses all significance ?
     \end{enumerate}
