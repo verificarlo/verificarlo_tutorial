@@ -1,0 +1,29 @@
+name: Build tutorial artifacts
+on: [push]
+jobs:
+  build_latex:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up Git repository
+        uses: actions/checkout@v2
+
+      - name: Compile LaTeX document
+        uses: dante-ev/latex-action@latest
+        with:
+          root_file: main-en.tex
+          args: -latexoption=-file-line-error -latexoption=-interaction=nonstopmode
+
+      - name: Upload pdf
+        uses: actions/upload-artifact@v3
+        with:
+          name: verificarlo-tutorial.pdf
+          path: main-en.pdf
+
+      - name: Tar sources
+        run: tar cvf verificarlo-tutorial.tar.gz verificarlo_tutorial/
+
+      - name: Upload pdf
+        uses: actions/upload-artifact@v3
+        with:
+          name: verificarlo-tutorial.tar.gz
+          path: verificarlo-tutorial.tar.gz
