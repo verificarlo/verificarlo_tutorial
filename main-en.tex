@@ -78,7 +78,7 @@ command instead of the usual \texttt{clang}, \texttt{icc} or \texttt{gcc}.
 Once a program is compiled with Verificarlo, you can load various backends to
 simulate round-off noise or the effect of lower floating-point precisions. Backends are selected and configured by defining the \texttt{VFC\_BACKENDS} environment variable.
 
-This tutorial will guide you through examples on how to use Verificarlo. 
+This tutorial will guide you through examples on how to use Verificarlo.
 If necessary, you can access an online documentation at \url{https://github.com/verificarlo/verificarlo}.
 
 In this tutorial, we will use the docker container available at
@@ -95,25 +95,25 @@ $ docker run -v $PWD:/workdir -it verificarlo/verificarlo bash
 
 \begin{question}
   Start the docker container and ensure that you can run the \texttt{verificarlo} command,
-\begin{verbatim}
+  \begin{verbatim}
 $ verificarlo --help
 \end{verbatim}
 \end{question}
 
 %% Uncomment below lines to include the Polynomial analysis
 \input{polynomial}
-%% Uncomment below lines to include the extra Horn Compensated analysis
+
+%% Uncomment below lines to include the Factored Form + VPREC
 \FloatBarrier
-\input{polynomial-compensated}
-%% Uncomment below lines to include the extra Factored Form analysis
-%% \FloatBarrier
-%% \input{polynomial-factored}
+\input{polynomial-factored}
 
 %% Uncomment the following line to include Delta Debug in the tutorial
 \FloatBarrier
 \input{deltadebug}
 
-
+%% Uncomment below lines to include the extra Horn Compensated analysis
+\FloatBarrier
+\input{polynomial-compensated}
 
 %% Uncomment the following line to include Veritracer in the tutorial
 %% \FloatBarrier
