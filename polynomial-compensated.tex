@@ -1,7 +1,53 @@
-\subsection{BONUS: Compensated Horner's method}
-This section corresponds to a Bonus exercice on the Compensated Horner's Method.
+\section{Bonus exercices}
+\subsection{Polynomial evaluation using Horner's method}
 
-"Compensated" algorithms belong to the class of algorithms that increase
+There exists multiple ways to evaluate polynomials, using associativity, commutativity and factorization.
+Each evaluation scheme has its own impact on precision and performance.
+One of them has already been the subject of many studies: the Horner's method which for the considered polynomial takes the following form:
+
+\[
+  T(x) = (\dots((a_n\times x^2 + a_{n-1})\times x^2 + a_{n-2})\dots) \times x^2
+  + a_0
+\]
+
+$$T(x) = (((((((((524288*x^2-2621440)*x^2+5570560)*x^2-6553600)*$$
+$$x^2+4659200)*x^2-2050048)*x^2+549120)*x^2-84480)*$$
+$$x^2+6600)*x^2-200)*x^2+1$$
+
+\begin{question}
+  \begin{enumerate}[(a)]
+    \item Open the file {\tt tchebychev.c} and have a look to the function {\tt REAL horner(REAL x)}
+    \item While keeping previous execution parameters, execute the command {\tt ./run.sh HORNER DOUBLE 53 mca}  \newline The output of this command is given in table~\ref{fig:hor_24_53} (Left).
+  \end{enumerate}
+\end{question}
+
+\begin{question}
+  \item Execute the command {\tt ./run.sh HORNER DOUBLE 24 mca}  \newline
+  The output of this command is given in table~\ref{fig:hor_24_53} (Right).
+  What do you observe?
+\end{question}
+
+\begin{table}
+  \begin{tabular}{cc}
+    \includegraphics[width=.47\textwidth]{HORNER-DOUBLE-24.pdf} &
+    \includegraphics[width=.47\textwidth]{HORNER-DOUBLE-53.pdf}   \\
+    %Horner form, 24 bits & Horner form, 53 bits \\
+  \end{tabular}
+  \caption{Evaluation of T(x) with Horner's scheme, compiled in double precision, with a virtual precision of \{24/53\} bits}
+  \label{fig:hor_24_53}
+\end{table}
+
+
+
+As shown in this experiment, the improvment brought by the Horner scheme is not significant ($\simeq$ 1 additional significant bit in the result).
+However, it minimizes the
+number of operations and allows to use the FMA ({\it Fused Multiply Add}). For
+a polynomial of degree $n$, it produces $n-1$ FMA. Moreover, when doing
+multiple independent evaluations it can be vectorized.
+
+\subsection{Compensated Horner's method}
+
+\emph{Compensated} algorithms belong to the class of algorithms that increase
 program precision without changing the internal working format.
 The goal is to capture for each operation an estimation of the error term and to reinject it into the result.
 For the Horner scheme, it is possible to retrieve at every step the error in
@@ -13,14 +59,14 @@ The algorithm for the compensated horner scheme described in \cite{graillat2005c
 
 \begin{algorithmic}[1]
   \Procedure{compHorner}{$x$,$\{a_1, a_2, \ldots, a_n\}$}
-    \State {$s_n \gets a_n$}
-    \State {$r_n \gets 0$}
-    \For {$i \in [n-1:0]$}
-       \State $[p_i, pe_i] \gets \text{\sc TWOPROD}(s_{i+1}, x^2)$
-       \State $[s_i, se_i] \gets \text{\sc TWOSUM}(p_i, a_i)$
-       \State $r_i \gets r_{i+1}\times x^2+(pe_i+se_i)$
-    \EndFor
-    \State \Return $s_0 + r_0$
+  \State {$s_n \gets a_n$}
+  \State {$r_n \gets 0$}
+  \For {$i \in [n-1:0]$}
+  \State $[p_i, pe_i] \gets \text{\sc TWOPROD}(s_{i+1}, x^2)$
+  \State $[s_i, se_i] \gets \text{\sc TWOSUM}(p_i, a_i)$
+  \State $r_i \gets r_{i+1}\times x^2+(pe_i+se_i)$
+  \EndFor
+  \State \Return $s_0 + r_0$
   \EndProcedure
 \end{algorithmic}
 
@@ -35,19 +81,19 @@ We provide implementations for EFT in the {\tt libeft.c} and {\tt libeft.h} file
     \item Run comphorner with the following command: {\tt ./run.sh COMPHORNER FLOAT 24 rr}
     \item Run comphorner with the following command: {\tt ./run.sh COMPHORNER DOUBLE 53 rr}
     \item What happens if you use a precision different from 53 for program compiled in DOUBLE precision?
-      $\Rightarrow$ WARNING, {\sc TWOPROD} and {\sc TWOSUM} rely on exact operations; it is essential to use RR 53 (Random Rounding with precision 53) mode of verificarlo for  \texttt{double} or RR 24 for \texttt{float}.
-      \\~\\
-      You should get the results in table~\ref{fig:comphornerVerificarlo24_53}.
+          $\Rightarrow$ WARNING, {\sc TWOPROD} and {\sc TWOSUM} rely on exact operations; it is essential to use RR 53 (Random Rounding with precision 53) mode of verificarlo for  \texttt{double} or RR 24 for \texttt{float}.
+          \\~\\
+          You should get the results in table~\ref{fig:comphornerVerificarlo24_53}.
 
   \end{enumerate}
 \end{question}
 
 
 \begin{table}
-\begin{tabular}{cc}
-\includegraphics[width=.47\textwidth]{COMPHORNER-FLOAT-24+err.pdf}& 
-\includegraphics[width=.47\textwidth]{COMPHORNER-DOUBLE-53+err.pdf}\\
-\end{tabular}
+  \begin{tabular}{cc}
+    \includegraphics[width=.47\textwidth]{COMPHORNER-FLOAT-24+err.pdf} &
+    \includegraphics[width=.47\textwidth]{COMPHORNER-DOUBLE-53+err.pdf}  \\
+  \end{tabular}
   \caption{Evaluation of T(x) using Horner and compHorner in single/double (left/right) precision: error estimated by verificarlo (blue), compared to the real error (green)}
   \label{fig:comphornerVerificarlo24_53}
 \end{table}
