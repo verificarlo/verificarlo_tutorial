@@ -20,9 +20,9 @@ jobs:
           path: main-en.pdf
 
       - name: Tar sources
-        run: tar cvf verificarlo-tutorial.tar.gz verificarlo_tutorial/
+        run: tar cvf verificarlo-tutorial.tar.gz verificarlo-tutorial/
 
-      - name: Upload pdf
+      - name: Upload sources
         uses: actions/upload-artifact@v3
         with:
           name: verificarlo-tutorial.tar.gz
