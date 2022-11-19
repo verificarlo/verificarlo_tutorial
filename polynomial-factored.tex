@@ -15,7 +15,7 @@ We will now evaluate the evaluation precision of the following factored rewritin
 \begin{question}
     \begin{enumerate}[(a)]
         \item Open the file {\tt tchebychev.c} and have a look to the function {\tt REAL factored (REAL x)}
-        \item Execute the command {\tt ./run.sh FACTORED FLOAT 24} \newline
+        \item Execute the command {\tt ./run.sh FACTORED FLOAT 24 mca} \newline
               The output of this command is given in figure~\ref{fig:factored:float}.
         \item Compare these results to those obtained with the EXPANDED version.
     \end{enumerate}
@@ -99,28 +99,27 @@ with the selected reduced type. It correctly handles overflow, underflows, and
 rounding in the target type.
 
 To use VPREC one can either tune manually the range and precision of the target
-type. The option {\tt --precision-binary64=PRECISION} controls the
+type. The option {\tt -{}-precision-binary64} controls the
 pseudo-mantissa bit length of the new tested format for floating-point
-operations in double precision. The option {\tt --range-binary64=PRECISION}
+operations in double precision. The option {\tt -{}-range-binary64}
 controls the exponent bit length of the target format.
 
 One can also use one of the standard presets: binary16, binary32, bfloat16,
 tensorfloat, fp24, PXR24; which automatically sets the corresponding range and
-precisions. The option for setting a preset is {\tt --preset=PRESET}.
-
+precisions.
 
 \begin{question}
     \begin{enumerate}[(a)]
         \item Compile and run the benchmark using single precision without verificarlo
               \begin{verbatim}
-clang -D FLOAT -o reference tchebychev.c
+clang-7 -D FLOAT -o reference tchebychev.c
 ./reference 0.75 FACTORED
 7.5000000e-01 -3.1220961e-01
 \end{verbatim}
         \item Now compile it using double precision with verificarlo
               \begin{verbatim}
 verificarlo -D DOUBLE -o tchebychev tchebychev.c
-VFC_BACKENDS="libinterflop_vprec.so --preset=binary32" ./tchebychev 0.75 FACTORED 
+VFC_BACKENDS="libinterflop_vprec.so --preset=binary32" ./tchebychev 0.75 FACTORED
 7.5000000000000000e-01 -3.1220960617065430e-01
 \end{verbatim}
         \item Compare the mantissas between the two previous runs. Observe that VPREC has accurately emulated binary32 (FLOAT) format.
@@ -131,12 +130,12 @@ VFC_BACKENDS="libinterflop_vprec.so --preset=binary32" ./tchebychev 0.75 FACTORE
     \begin{enumerate}[(a)]
         \item You can emulate the effect of bfloat16 using
               \begin{verbatim}
-VFC_BACKENDS="libinterflop_vprec.so --preset=bfloat16" ./tchebychev 0.75 FACTORED 
+VFC_BACKENDS="libinterflop_vprec.so --preset=bfloat16" ./tchebychev 0.75 FACTORED
 7.5000000000000000e-01 -3.1250000000000000e-01
 \end{verbatim}
         \item You can also emulate a custom precision, such as 12 bits, with
               \begin{verbatim}
-VFC_BACKENDS="libinterflop_vprec.so --precision-binary64=12" ./tchebychev 0.75 FACTORED 
+VFC_BACKENDS="libinterflop_vprec.so --precision-binary64=12" ./tchebychev 0.75 FACTORED
 7.5000000000000000e-01 -3.1225585937500000e-01
 \end{verbatim}
         \item Try different precisions, at which threshold does the computation looses all significance ?
